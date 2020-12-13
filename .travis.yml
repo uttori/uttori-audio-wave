@@ -1,0 +1,21 @@
+language: node_js
+node_js:
+  - "10"
+  - "12"
+  - "14"
+
+install:
+  - npm ci
+
+cache:
+  directories:
+  - "$HOME/.npm"
+
+script:
+  - npm run lint
+  - npm run validate --prod
+  - npm run test && nyc report --reporter=text-lcov | coveralls
+
+branches:
+  only:
+    - master

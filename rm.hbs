@@ -1,0 +1,92 @@
+[![view on npm](https://img.shields.io/npm/v/uttori-audio-wave.svg)](https://www.npmjs.org/package/uttori-audio-wave)
+[![npm module downloads](https://img.shields.io/npm/dt/uttori-audio-wave.svg)](https://www.npmjs.org/package/uttori-audio-wave)
+[![Build Status](https://travis-ci.org/uttori/uttori-audio-wave.svg?branch=master)](https://travis-ci.org/uttori/uttori-audio-wave)
+[![Dependency Status](https://david-dm.org/uttori/uttori-audio-wave.svg)](https://david-dm.org/uttori/uttori-audio-wave)
+[![Coverage Status](https://coveralls.io/repos/github/uttori/uttori-audio-wave/badge.svg?branch=master)](https://coveralls.io/github/uttori/uttori-audio-wave?branch=master)
+
+# Uttori AudioWAV
+
+Utility for reading, parsing and basic encoding for Waveform Audio File Format (WAVE / WAV) files.
+
+## Install
+
+```bash
+npm install --save uttori-audio-wave
+```
+
+* * *
+
+# Example
+
+In this example we convert a valid 16 bit, 44.1kHz Wave file to be used with an SP-404SX by adding the appropriate header.
+
+```js
+const fs = require('fs');
+const { AudioWAV } = require('uttori-audio-wave');
+
+// Read in a WAV file with AudioWAV
+const data = fs.readFileSync('./test/assets/input.wav');
+const input = AudioWAV.fromFile(data);
+const { chunks } = input;
+
+// Remove the header, we will make a new one with our new size.
+chunks.splice(0, 1);
+
+// Remove any existing RLND chunks, should be after `fmt `
+const roland_index = chunks.findIndex((chunk) => chunk.type === 'roland');
+if (roland_index > 0) {
+  chunks.splice(roland_index, 1);
+}
+
+// Create a RLND chunk and set the pad to A1
+const rlnd = AudioWAV.encodeRLND({ device: 'roifspsx', sampleIndex: 'J12' });
+
+// Add the new RLND after the format chunk
+const index = chunks.findIndex((chunk) => chunk.type === 'format');
+chunks.splice(index + 1, 0, { type: 'roland', chunk: rlnd });
+
+// Calculate the total size, include `WAVE` text (4 bytes)
+const size = chunks.reduce((total, chunk) => {
+  total += chunk.chunk.length;
+  return total;
+}, 4);
+
+// Build the binary data
+const header = AudioWAV.encodeHeader({ size });
+const parts = chunks.reduce((arr, chunk) => {
+  arr.push(Buffer.from(chunk.chunk));
+  return arr;
+}, [header]);
+const output = Buffer.concat(parts);
+
+// Write file, *.WAV as that is what the offical software uses.
+fs.writeFileSync('./test/assets/output.WAV', output);
+```
+
+# API Reference
+
+{{>main}}
+
+* * *
+
+## Tests
+
+To run the test suite, first install the dependencies, then run `npm test`:
+
+```bash
+npm install
+npm test
+DEBUG=Uttori* npm test
+```
+
+## Contributors
+
+* [Matthew Callis](https://github.com/MatthewCallis)
+
+## Thanks
+
+* [Paul Battley](https://github.com/threedaymonk) - His [Roland SP-404SX sample file format](https://gist.github.com/threedaymonk/701ca30e5d363caa288986ad972ab3e0) was a huge help.
+
+## License
+
+* [MIT](LICENSE)
