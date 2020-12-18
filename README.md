@@ -38,7 +38,7 @@ if (roland_index > 0) {
   chunks.splice(roland_index, 1);
 }
 
-// Create a RLND chunk and set the pad to A1
+// Create a RLND chunk and set the pad to J12
 const rlnd = AudioWAV.encodeRLND({ device: 'roifspsx', sampleIndex: 'J12' });
 
 // Add the new RLND after the format chunk
