@@ -135,7 +135,7 @@ test('AudioWAV.encodeFMT(data): can encode a fmt chunk', (t) => {
 });
 
 test('AudioWAV.decodeRLND(): can decode a Roland SP-404SX chunk', (t) => {
-  const data = fs.readFileSync('./test/assets/J0000012.wav');
+  const data = fs.readFileSync('./test/assets/J0000012.WAV');
   const audio = AudioWAV.fromFile(data);
   t.is(audio.chunks.length, 4);
   t.is(audio.chunks[2].type, 'roland');
