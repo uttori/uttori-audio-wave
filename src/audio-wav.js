@@ -182,7 +182,11 @@ class AudioWAV extends DataStream {
         this.rewind(8);
         const chunk = this.read(8 + size, true);
         AudioWAV.decodeDATA(chunk);
-        this.chunks.push({ type: 'data', chunk });
+
+        // Calculate the duration: ((chunk_size) / (sample_rate * channels * (bits_per_sample / 8)))
+        const format = this.chunks.find((c) => c.type === 'format');
+        const duration = size / format.value.byteRate;
+        this.chunks.push({ type: 'data', chunk, value: { duration } });
         break;
       }
       case 'LIST': {
@@ -1026,7 +1030,7 @@ class AudioWAV extends DataStream {
     // 8000, 44100, 96000, etc.
     const sampleRate = format.readUInt32(true);
 
-    // Sample Rate * Channels * Bits per Sample / 8
+    // Sample Rate * Channels * (Bits per Sample / 8)
     const byteRate = format.readUInt32(true);
 
     // Channels * Bits per Sample / 8

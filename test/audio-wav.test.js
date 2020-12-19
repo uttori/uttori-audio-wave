@@ -39,6 +39,7 @@ test('AudioWAV.decodeHeader(): can detect a valid RF64 heade & decode DS64 tags'
   t.is(audio.chunks[1].type, 'data_size_64');
   t.is(audio.chunks[2].type, 'format');
   t.is(audio.chunks[3].type, 'data');
+  t.deepEqual(audio.chunks[3].value, { duration: 0.5 });
 });
 
 test('AudioWAV.decodeHeader(): can detect a broken RIFF header', (t) => {
@@ -114,6 +115,7 @@ test('AudioWAV.decodeFMT(): can decode a Format chunk', (t) => {
     sampleRate: 44100,
     size: 18,
   });
+  t.deepEqual(audio.chunks[3].value, { duration: 2.1818367346938774 });
 });
 
 test('AudioWAV.encodeFMT(data): can encode a fmt chunk', (t) => {
@@ -150,6 +152,7 @@ test('AudioWAV.decodeRLND(): can decode a Roland SP-404SX chunk', (t) => {
     unknown3: 0,
     unknown4: 0,
   });
+  t.deepEqual(audio.chunks[3].value, { duration: 0.2999546485260771 });
 });
 
 test('AudioWAV.encodeRLND(data): can encode a RLND chunk', (t) => {
