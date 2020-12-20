@@ -1,5 +1,5 @@
 {
-  "name": "uttori-audio-wave",
+  "name": "@uttori/audio-wave",
   "version": "1.1.0",
   "description": "Utility for reading & wrtiing WAV audio files.",
   "author": "Matthew Callis <matthew.callis@gmail.com>",
@@ -18,10 +18,11 @@
     "audio",
     "wave",
     "sp404",
-    "sp404sx"
+    "sp404sx",
+    "sp404a"
   ],
   "engines": {
-    "node": ">= 10"
+    "node": ">= 12"
   },
   "dependencies": {
     "@uttori/data-tools": "^1.6.0",
@@ -98,5 +99,9 @@
   "pre-commit": [
     "lint",
     "test"
-  ]
+  ],
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  }
 }
