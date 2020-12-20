@@ -1,5 +1,5 @@
-[![view on npm](https://img.shields.io/npm/v/uttori-audio-wave.svg)](https://www.npmjs.org/package/uttori-audio-wave)
-[![npm module downloads](https://img.shields.io/npm/dt/uttori-audio-wave.svg)](https://www.npmjs.org/package/uttori-audio-wave)
+[![view on npm](https://img.shields.io/npm/v/uttori-audio-wave.svg)](https://www.npmjs.com/package/@uttori/audio-wave)
+[![npm module downloads](https://img.shields.io/npm/dt/uttori-audio-wave.svg)](https://www.npmjs.com/package/@uttori/audio-wave)
 [![Build Status](https://travis-ci.org/uttori/uttori-audio-wave.svg?branch=master)](https://travis-ci.org/uttori/uttori-audio-wave)
 [![Dependency Status](https://david-dm.org/uttori/uttori-audio-wave.svg)](https://david-dm.org/uttori/uttori-audio-wave)
 [![Coverage Status](https://coveralls.io/repos/github/uttori/uttori-audio-wave/badge.svg?branch=master)](https://coveralls.io/github/uttori/uttori-audio-wave?branch=master)
@@ -11,7 +11,7 @@ Utility for reading, parsing and basic encoding for Waveform Audio File Format (
 ## Install
 
 ```bash
-npm install --save uttori-audio-wave
+npm install --save @uttori/audio-wave
 ```
 
 * * *
@@ -22,12 +22,11 @@ In this example we convert a valid 16 bit, 44.1kHz Wave file to be used with an 
 
 ```js
 const fs = require('fs');
-const { AudioWAV } = require('uttori-audio-wave');
+const { AudioWAV } = require('@uttori/audio-wave');
 
 // Read in a WAV file with AudioWAV
 const data = fs.readFileSync('./test/assets/input.wav');
-const input = AudioWAV.fromFile(data);
-const { chunks } = input;
+const { chunks } = AudioWAV.fromFile(data);
 
 // Remove the header, we will make a new one with our new size.
 chunks.splice(0, 1);
