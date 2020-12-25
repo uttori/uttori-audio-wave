@@ -11,7 +11,7 @@ declare module "audio-wav" {
         }): Buffer;
         static decodeFMT(chunk: string | Buffer): object;
         static encodeFMT(data?: {
-            audioFormat: number;
+            audioFormatValue: number;
             channels: number;
             sampleRate: number;
             byteRate: number;

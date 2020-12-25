@@ -121,7 +121,7 @@ test('AudioWAV.decodeFMT(): can decode a Format chunk', (t) => {
 test('AudioWAV.encodeFMT(data): can encode a fmt chunk', (t) => {
   const valid = fs.readFileSync('./test/assets/fmt_chunk.bin');
   const data = {
-    audioFormat: 1,
+    audioFormatValue: 1,
     channels: 2,
     sampleRate: 44100,
     byteRate: 176400,

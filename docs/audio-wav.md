@@ -170,7 +170,7 @@ RF64 specific fields are currently unsupported.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [data] | <code>object</code> | <code>{}</code> | The values to encode to the `fmt ` chunk. |
-| [data.audioFormat] | <code>number</code> | <code>1</code> | Format of the audio data, 1 is PCM and values other than 1 indicate some form of compression. See `decodeFMT` for a listing |
+| [data.audioFormatValue] | <code>number</code> | <code>1</code> | Format of the audio data, 1 is PCM and values other than 1 indicate some form of compression. See `decodeFMT` for a listing |
 | [data.channels] | <code>number</code> | <code>2</code> | Mono = 1, Stereo = 2, etc. |
 | [data.sampleRate] | <code>number</code> | <code>44100</code> | 8000, 44100, 96000, etc. |
 | [data.byteRate] | <code>number</code> | <code>176400</code> | Sample Rate * Channels * Bits per Sample / 8 |

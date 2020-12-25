@@ -3,6 +3,10 @@
 [![Build Status](https://travis-ci.org/uttori/uttori-audio-wave.svg?branch=master)](https://travis-ci.org/uttori/uttori-audio-wave)
 [![Dependency Status](https://david-dm.org/uttori/uttori-audio-wave.svg)](https://david-dm.org/uttori/uttori-audio-wave)
 [![Coverage Status](https://coveralls.io/repos/github/uttori/uttori-audio-wave/badge.svg?branch=master)](https://coveralls.io/github/uttori/uttori-audio-wave?branch=master)
+[![Tree-Shaking Support](https://badgen.net/bundlephobia/tree-shaking/@uttori/audio-wave)](https://bundlephobia.com/result?p=@uttori/audio-wave)
+[![Dependency Count](https://badgen.net/bundlephobia/dependency-count/@uttori/audio-wave)](https://bundlephobia.com/result?p=@uttori/audio-wave)
+[![Minified + GZip](https://badgen.net/bundlephobia/minzip/@uttori/audio-wave)](https://bundlephobia.com/result?p=@uttori/audio-wave)
+[![Minified](https://badgen.net/bundlephobia/min/@uttori/audio-wave)](https://bundlephobia.com/result?p=@uttori/audio-wave)
 
 # Uttori AudioWAV
 
@@ -236,7 +240,7 @@ RF64 specific fields are currently unsupported.
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | [data] | <code>object</code> | <code>{}</code> | The values to encode to the `fmt ` chunk. |
-| [data.audioFormat] | <code>number</code> | <code>1</code> | Format of the audio data, 1 is PCM and values other than 1 indicate some form of compression. See `decodeFMT` for a listing |
+| [data.audioFormatValue] | <code>number</code> | <code>1</code> | Format of the audio data, 1 is PCM and values other than 1 indicate some form of compression. See `decodeFMT` for a listing |
 | [data.channels] | <code>number</code> | <code>2</code> | Mono = 1, Stereo = 2, etc. |
 | [data.sampleRate] | <code>number</code> | <code>44100</code> | 8000, 44100, 96000, etc. |
 | [data.byteRate] | <code>number</code> | <code>176400</code> | Sample Rate * Channels * Bits per Sample / 8 |

@@ -1169,7 +1169,7 @@ class AudioWAV extends DataStream {
    * RF64 specific fields are currently unsupported.
    *
    * @param {object} [data={}] - The values to encode to the `fmt ` chunk.
-   * @param {number} [data.audioFormat=1] - Format of the audio data, 1 is PCM and values other than 1 indicate some form of compression. See `decodeFMT` for a listing
+   * @param {number} [data.audioFormatValue=1] - Format of the audio data, 1 is PCM and values other than 1 indicate some form of compression. See `decodeFMT` for a listing
    * @param {number} [data.channels=2] - Mono = 1, Stereo = 2, etc.
    * @param {number} [data.sampleRate=44100] - 8000, 44100, 96000, etc.
    * @param {number} [data.byteRate=176400] - Sample Rate * Channels * Bits per Sample / 8
@@ -1183,7 +1183,7 @@ class AudioWAV extends DataStream {
   static encodeFMT(data = {}) {
     debug('encodeFMT:', data);
     const {
-      audioFormat = 1,
+      audioFormatValue = 1,
       channels = 2,
       sampleRate = 44100,
       byteRate = 176400,
@@ -1203,7 +1203,7 @@ class AudioWAV extends DataStream {
     buffer.writeUInt32LE(26 - 8 + extraParamSize, 4);
 
     // Audio Format: 1 for PCM
-    buffer.writeUInt16LE(audioFormat, 8);
+    buffer.writeUInt16LE(audioFormatValue, 8);
 
     // Channels: 1 or 2
     buffer.writeUInt16LE(channels, 10);
