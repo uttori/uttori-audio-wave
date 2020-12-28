@@ -1290,6 +1290,10 @@ class AudioWAV extends DataStream {
       info.id = list.readString(4);
       info.size = list.readUInt32(true);
       info.text = list.readString(info.size);
+      // All blocks must begin on an EVEN boundary and the block size MUST NOT include the padding byte, if required.
+      if (info.size % 2 !== 0) {
+        list.advance(1);
+      }
       value.push(info);
     }
     return value;

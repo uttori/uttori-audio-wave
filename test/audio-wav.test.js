@@ -98,6 +98,14 @@ test('AudioWAV.decodeLISTINFO(): can decode a LIST INFO chunk', (t) => {
   t.is(audio.chunks[2].value.type, 'INFO');
 });
 
+test('AudioWAV.decodeLISTINFO(): can handle the odd chunk alignment quirk', (t) => {
+  const data = fs.readFileSync('./test/assets/ODD-CHUNK-LIST-INFO.bin');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 3);
+  t.is(audio.chunks[2].type, 'list');
+  t.is(audio.chunks[2].value.type, 'INFO');
+});
+
 test('AudioWAV.decodeFMT(): can decode a Format chunk', (t) => {
   const data = fs.readFileSync('./test/assets/A0000001.wav');
   const audio = AudioWAV.fromFile(data);
