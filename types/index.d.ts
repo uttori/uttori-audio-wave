@@ -1,8 +1,8 @@
 declare module "audio-wav" {
     export = AudioWAV;
     class AudioWAV {
-        static fromFile(data: Buffer): AudioWAV;
-        static fromBuffer(buffer: any): AudioWAV;
+        static fromFile(data: Buffer, options: object): AudioWAV;
+        static fromBuffer(buffer: any, options: object): AudioWAV;
         static decodeHeader(chunk: string | Buffer): object;
         static encodeHeader(data: {
             riff: string;
@@ -26,6 +26,7 @@ declare module "audio-wav" {
         static decodeDATA(chunk: string | Buffer): void;
         static decodeTLST(chunk: string | Buffer): object;
         static decodeFACT(chunk: string | Buffer): object;
+        static decodeDISP(chunk: string | Buffer): object;
         static decodeACID(chunk: string | Buffer): object;
         static decodeINST(chunk: string | Buffer): object;
         static decodeSMPL(chunk: string | Buffer): object;
@@ -38,15 +39,20 @@ declare module "audio-wav" {
             unknown4: number;
             sampleIndex: number | string;
         }): Buffer;
-        static decodeJUNK(chunk: string | Buffer): void;
-        static decodeBEXT(chunk: string | Buffer): object;
+        static decodeJUNK(chunk: string | Buffer, options: {
+            roundOddChunks: boolean;
+        }): void;
+        static decodeBEXT(chunk: string | Buffer, options: {
+            roundOddChunks: boolean;
+        }): object;
         static decodeCue(chunk: string | Buffer): object;
         static decodeResU(chunk: string | Buffer): object;
         static decodeDS64(chunk: string | Buffer): object;
         constructor(list: any, overrides?: {
             size: number;
-        });
+        }, opts: object);
         chunks: any[];
+        options: any;
         parse(): void;
         decodeChunk(): string;
     }

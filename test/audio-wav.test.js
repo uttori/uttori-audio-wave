@@ -251,3 +251,51 @@ test('AudioWAV.decodeChunk(): can decode a `tlst` chunk and an edge case LIST ad
   });
   t.is(audio.chunks[7].type, 'list');
 });
+
+// LGWV: Logic Pro (Old), LoGicWaV
+// FLLR: Padding? (FiLLeR?)
+test('AudioWAV.decodeChunk(): can decode a `LGWV` & `FLLR` an edge case chunk where data should be odd (clp_clap10000.wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/clp_clap10000.wav');
+  const audio = AudioWAV.fromFile(data, { roundOddChunks: false });
+  t.is(audio.chunks.length, 6);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'list');
+  t.is(audio.chunks[3].type, 'FLLR');
+  t.is(audio.chunks[4].type, 'data');
+  t.is(audio.chunks[5].type, 'LGWV');
+});
+
+// `DIST`
+// `cart` with odd size
+// `best` with odd size
+test('AudioWAV.decodeChunk(): can decode a DISP chunk and odd size `bext` and `cart` (Waka SNARE ROLL PATTERN (43).WAV)', (t) => {
+  const data = fs.readFileSync('./test/assets/Waka SNARE ROLL PATTERN (43).WAV');
+  const audio = AudioWAV.fromFile(data, { roundOddChunks: false });
+  t.is(audio.chunks.length, 7);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'data');
+  t.is(audio.chunks[3].type, 'list');
+  t.is(audio.chunks[4].type, 'display');
+  t.is(audio.chunks[5].type, 'broadcast_extension');
+  t.is(audio.chunks[6].type, 'cart');
+});
+
+// `strc` chunk, Broken `ltx` as part of decodeLISTadtl
+test('AudioWAV.decodeChunk(): can recover from a bad chunk (Bell.wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/Bell.wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 11);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'fact');
+  t.is(audio.chunks[3].type, 'data');
+  t.is(audio.chunks[4].type, 'sample');
+  t.is(audio.chunks[5].type, 'instrument');
+  t.is(audio.chunks[6].type, 'acid');
+  t.is(audio.chunks[7].type, 'strc');
+  t.is(audio.chunks[8].type, 'cue_points');
+  t.is(audio.chunks[9].type, 'ID3 ');
+  t.is(audio.chunks[10].type, 'list');
+});

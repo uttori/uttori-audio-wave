@@ -8,13 +8,13 @@ The WAVE file format is a subset of Microsoft's RIFF specification for the stora
 **Kind**: global class  
 
 * [AudioWAV](#AudioWAV)
-    * [new AudioWAV(list, [overrides])](#new_AudioWAV_new)
+    * [new AudioWAV(list, [overrides], opts)](#new_AudioWAV_new)
     * _instance_
         * [.parse()](#AudioWAV+parse)
         * [.decodeChunk()](#AudioWAV+decodeChunk) ⇒ <code>string</code>
     * _static_
-        * [.fromFile(data)](#AudioWAV.fromFile) ⇒ [<code>AudioWAV</code>](#AudioWAV)
-        * [.fromBuffer(buffer)](#AudioWAV.fromBuffer) ⇒ [<code>AudioWAV</code>](#AudioWAV)
+        * [.fromFile(data, options)](#AudioWAV.fromFile) ⇒ [<code>AudioWAV</code>](#AudioWAV)
+        * [.fromBuffer(buffer, options)](#AudioWAV.fromBuffer) ⇒ [<code>AudioWAV</code>](#AudioWAV)
         * [.decodeHeader(chunk)](#AudioWAV.decodeHeader) ⇒ <code>object</code>
         * [.encodeHeader(data)](#AudioWAV.encodeHeader) ⇒ <code>Buffer</code>
         * [.decodeFMT(chunk)](#AudioWAV.decodeFMT) ⇒ <code>object</code>
@@ -25,28 +25,30 @@ The WAVE file format is a subset of Microsoft's RIFF specification for the stora
         * [.decodeDATA(chunk)](#AudioWAV.decodeDATA)
         * [.decodeTLST(chunk)](#AudioWAV.decodeTLST) ⇒ <code>object</code>
         * [.decodeFACT(chunk)](#AudioWAV.decodeFACT) ⇒ <code>object</code>
+        * [.decodeDISP(chunk)](#AudioWAV.decodeDISP) ⇒ <code>object</code>
         * [.decodeACID(chunk)](#AudioWAV.decodeACID) ⇒ <code>object</code>
         * [.decodeINST(chunk)](#AudioWAV.decodeINST) ⇒ <code>object</code>
         * [.decodeSMPL(chunk)](#AudioWAV.decodeSMPL) ⇒ <code>object</code>
         * [.decodeRLND(chunk)](#AudioWAV.decodeRLND) ⇒ <code>object</code>
         * [.encodeRLND(data)](#AudioWAV.encodeRLND) ⇒ <code>Buffer</code>
-        * [.decodeJUNK(chunk)](#AudioWAV.decodeJUNK)
-        * [.decodeBEXT(chunk)](#AudioWAV.decodeBEXT) ⇒ <code>object</code>
+        * [.decodeJUNK(chunk, options)](#AudioWAV.decodeJUNK)
+        * [.decodeBEXT(chunk, options)](#AudioWAV.decodeBEXT) ⇒ <code>object</code>
         * [.decodeCue(chunk)](#AudioWAV.decodeCue) ⇒ <code>object</code>
         * [.decodeResU(chunk)](#AudioWAV.decodeResU) ⇒ <code>object</code>
         * [.decodeDS64(chunk)](#AudioWAV.decodeDS64) ⇒ <code>object</code>
 
 <a name="new_AudioWAV_new"></a>
 
-### new AudioWAV(list, [overrides])
+### new AudioWAV(list, [overrides], opts)
 Creates a new AudioWAV.
 
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | list | <code>DataBufferList</code> |  | The DataBufferList of the audio file to process. |
-| [overrides] | <code>object</code> |  | Options for this instance. |
+| [overrides] | <code>object</code> |  | Options for this DataStream instance. |
 | [overrides.size] | <code>number</code> | <code>16</code> | ArrayBuffer byteLength for the underlying binary parsing. |
+| opts | <code>object</code> |  | Options for this AudioWAV instance. |
 
 **Example** *(AudioWAV)*  
 ```js
@@ -81,7 +83,7 @@ CRC:    4 bytes
 **See**: [Chunk Layout](http://www.w3.org/TR/2003/REC-PNG-20031110/#5Chunk-layout)  
 <a name="AudioWAV.fromFile"></a>
 
-### AudioWAV.fromFile(data) ⇒ [<code>AudioWAV</code>](#AudioWAV)
+### AudioWAV.fromFile(data, options) ⇒ [<code>AudioWAV</code>](#AudioWAV)
 Creates a new AudioWAV from file data.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
@@ -90,10 +92,11 @@ Creates a new AudioWAV from file data.
 | Param | Type | Description |
 | --- | --- | --- |
 | data | <code>Buffer</code> | The data of the image to process. |
+| options | <code>object</code> | Options for returned AudioWAV instance. |
 
 <a name="AudioWAV.fromBuffer"></a>
 
-### AudioWAV.fromBuffer(buffer) ⇒ [<code>AudioWAV</code>](#AudioWAV)
+### AudioWAV.fromBuffer(buffer, options) ⇒ [<code>AudioWAV</code>](#AudioWAV)
 Creates a new AudioWAV from a DataBuffer.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
@@ -102,6 +105,7 @@ Creates a new AudioWAV from a DataBuffer.
 | Param | Type | Description |
 | --- | --- | --- |
 | buffer | <code>DataBuffer</code> | The DataBuffer of the image to process. |
+| options | <code>object</code> | Options for returned AudioWAV instance. |
 
 <a name="AudioWAV.decodeHeader"></a>
 
@@ -192,7 +196,7 @@ Decode the LIST (LIST Information) chunk.
 A LIST chunk defines a list of sub-chunks and has the following format.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -204,7 +208,7 @@ A LIST chunk defines a list of sub-chunks and has the following format.
 Decode the LIST INFO chunks.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The parsed list.  
+**Returns**: <code>object</code> - The parsed list.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -269,6 +273,33 @@ compute the length of the audio data in seconds.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
 **Returns**: <code>object</code> - - The decoded values.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+
+<a name="AudioWAV.decodeDISP"></a>
+
+### AudioWAV.decodeDISP(chunk) ⇒ <code>object</code>
+Decode the DISP (Display) chunk.
+
+The DISP chunk should be used as a direct child of the RIFF chunk so that any RIFF aware application can find it.
+There can be multiple DISP chunks with each containing different types of displayable data, but all representative of the same object.
+The DISP chunks should be stored in the file in order of preference (just as in the clipboard).
+
+The DISP chunk is especially beneficial when representing OLE data within an application.
+For example, when pasting a wave file into Excel, the creating application can use the DISP chunk to associate an icon and a text description to represent the embedded wave file.
+This text should be short so that it can be easily displayed in menu bars and under icons.
+Note: do not use a CF_TEXT for a description of the data.
+Bibliographic data chunks will be added to support the standard MARC (Machine Readable Cataloging) data.
+
+**Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+**Returns**: <code>object</code> - - The decoded values.  
+**See**
+
+- [New Multimedia Data Types and Data Techniques](http://netghost.narod.ru/gff/vendspec/micriff/ms_riff.txt)
+- [Standard Clipboard Formats](https://docs.microsoft.com/en-us/windows/win32/dataxchg/standard-clipboard-formats)
+
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -364,7 +395,7 @@ This chunk is sized and padded with zeros to ensure that the the sample data sta
 
 <a name="AudioWAV.decodeJUNK"></a>
 
-### AudioWAV.decodeJUNK(chunk)
+### AudioWAV.decodeJUNK(chunk, options)
 Decode the JUNK (Padding) chunk.
 
 To align RIFF chunks to certain boundaries (i.e. 2048 bytes for CD-ROMs) the RIFF specification includes a JUNK chunk.
@@ -376,14 +407,16 @@ When writing RIFFs, JUNK chunks should not have an odd Size.
 | Param | Type | Description |
 | --- | --- | --- |
 | chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+| options | <code>object</code> | Decoding options. |
+| options.roundOddChunks | <code>boolean</code> | When true we will round odd chunk sizes up to keep in spec. |
 
 <a name="AudioWAV.decodeBEXT"></a>
 
-### AudioWAV.decodeBEXT(chunk) ⇒ <code>object</code>
+### AudioWAV.decodeBEXT(chunk, options) ⇒ <code>object</code>
 Decode the bext (Broadcast Wave Format (BWF) Broadcast Extension) chunk.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 **See**
 
 - [Cue Chunk](https://sites.google.com/site/musicgapi/technical-documents/wav-file-format#cue)
@@ -393,6 +426,8 @@ Decode the bext (Broadcast Wave Format (BWF) Broadcast Extension) chunk.
 | Param | Type | Description |
 | --- | --- | --- |
 | chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+| options | <code>object</code> | Decoding options. |
+| options.roundOddChunks | <code>boolean</code> | When true we will round odd chunk sizes up to keep in spec. |
 
 <a name="AudioWAV.decodeCue"></a>
 

@@ -18,6 +18,7 @@ AudioWAV supports parsing the following WAVE chunks:
 - `bext` - Broadcast Wave Format (BWF) Broadcast Extension Chunk
 - `cue ` - Cue Points Chunk
 - `data` - Audio Data Chunk
+- `DISP` - Display Chunk
 - `ds64` - DataSize 64 Chunk
 - `fact` - Additional Data Chunk
 - `fmt ` - Format Chunk (Encode Avaliable)
@@ -33,6 +34,15 @@ AudioWAV supports parsing the following WAVE chunks:
 
 ```bash
 npm install --save @uttori/audio-wave
+```
+
+## Configuration
+
+```js
+{
+  // This keeps data chunks even and in spec, however some files fail with this.
+  roundOddChunks: true,
+}
 ```
 
 * * *

@@ -18,12 +18,13 @@ class AudioWAV extends DataStream {
   /**
    * Creates a new AudioWAV.
    *
-   * @param {DataBufferList} list - The DataBufferList of the audio file to process.
-   * @param {object} [overrides] - Options for this instance.
-   * @param {number} [overrides.size=16] - ArrayBuffer byteLength for the underlying binary parsing.
+   * @param {DataBufferList} list The DataBufferList of the audio file to process.
+   * @param {object} [overrides] Options for this DataStream instance.
+   * @param {number} [overrides.size=16] ArrayBuffer byteLength for the underlying binary parsing.
+   * @param {object} opts Options for this AudioWAV instance.
    * @class
    */
-  constructor(list, overrides) {
+  constructor(list, overrides, opts) {
     const options = {
       size: 16,
       ...overrides,
@@ -32,36 +33,44 @@ class AudioWAV extends DataStream {
 
     this.chunks = [];
 
+    this.options = {
+      // This keeps in spec, some files fail with this.
+      roundOddChunks: true,
+      ...opts,
+    };
+
     this.parse();
   }
 
   /**
    * Creates a new AudioWAV from file data.
    *
-   * @param {Buffer} data - The data of the image to process.
+   * @param {Buffer} data The data of the image to process.
+   * @param {object} options Options for returned AudioWAV instance.
    * @returns {AudioWAV} the new AudioWAV instance for the provided file data
    * @static
    */
-  static fromFile(data) {
+  static fromFile(data, options) {
     debug('fromFile:', data.length);
     const buffer = new DataBuffer(data);
     const list = new DataBufferList();
     list.append(buffer);
-    return new AudioWAV(list, { size: data.length });
+    return new AudioWAV(list, { size: data.length }, options);
   }
 
   /**
    * Creates a new AudioWAV from a DataBuffer.
    *
    * @param {DataBuffer} buffer - The DataBuffer of the image to process.
+   * @param {object} options Options for returned AudioWAV instance.
    * @returns {AudioWAV} the new AudioWAV instance for the provided DataBuffer
    * @static
    */
-  static fromBuffer(buffer) {
+  static fromBuffer(buffer, options) {
     debug('fromBuffer:', buffer.length);
     const list = new DataBufferList();
     list.append(buffer);
-    return new AudioWAV(list, { size: buffer.length });
+    return new AudioWAV(list, { size: buffer.length }, options);
   }
 
   /**
@@ -74,7 +83,13 @@ class AudioWAV extends DataStream {
     this.chunks.push({ type: 'header', value });
 
     while (this.remainingBytes()) {
-      this.decodeChunk();
+      try {
+        this.decodeChunk();
+      } catch (error) {
+        debug('Error Parsing:', error);
+        // eslint-disable-next-line no-console
+        console.error(error);
+      }
     }
   }
 
@@ -161,9 +176,11 @@ class AudioWAV extends DataStream {
    * @see {@link http://www.w3.org/TR/2003/REC-PNG-20031110/#5Chunk-layout|Chunk Layout}
    */
   decodeChunk() {
-    debug('decodeChunk');
+    debug('decodeChunk at offset', this.offset, 'of', this.size, 'bytes and', this.remainingBytes(), 'remaining bytes');
     const type = this.readString(4);
+    debug('decodeChunk type', type);
     let size = this.readUInt32(true);
+    debug('decodeChunk size', size);
 
     /* istanbul ignore next */
     if (size < 0) {
@@ -171,9 +188,16 @@ class AudioWAV extends DataStream {
     }
 
     // Size should be even.
-    if (size % 2 !== 0) {
+    if (this.options.roundOddChunks && size % 2 !== 0) {
       size += 1;
     }
+    /* istanbul ignore next */
+    if (size > this.remainingBytes()) {
+      debug('decodeChunk size', size, 'too large, using remaining bytes', this.remainingBytes());
+      size = this.remainingBytes();
+    }
+
+    // TODO: Check for known misread headers to fix off by 1 errors.
 
     switch (type) {
       case 'fmt ': {
@@ -195,6 +219,13 @@ class AudioWAV extends DataStream {
         const chunk = this.read(8 + size, true);
         const value = AudioWAV.decodeINST(chunk);
         this.chunks.push({ type: 'instrument', value, chunk });
+        break;
+      }
+      case 'DISP': {
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        const value = AudioWAV.decodeDISP(chunk);
+        this.chunks.push({ type: 'display', value, chunk });
         break;
       }
       case 'smpl': {
@@ -239,7 +270,7 @@ class AudioWAV extends DataStream {
       case 'JUNK': {
         this.rewind(8);
         const chunk = this.read(8 + size, true);
-        AudioWAV.decodeJUNK(chunk);
+        AudioWAV.decodeJUNK(chunk, this.options);
         this.chunks.push({ type: 'junk', chunk });
         break;
       }
@@ -260,7 +291,7 @@ class AudioWAV extends DataStream {
       case 'bext': {
         this.rewind(8);
         const chunk = this.read(8 + size, true);
-        const value = AudioWAV.decodeBEXT(chunk);
+        const value = AudioWAV.decodeBEXT(chunk, this.options);
         this.chunks.push({ type: 'broadcast_extension', value, chunk });
         break;
       }
@@ -276,6 +307,12 @@ class AudioWAV extends DataStream {
         const chunk = this.read(8 + size, true);
         const value = AudioWAV.decodeDS64(chunk);
         this.chunks.push({ type: 'data_size_64', value, chunk });
+        break;
+      }
+      case 'cart': {
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        this.chunks.push({ type: 'cart', chunk, unknown: true });
         break;
       }
       default: {
@@ -1271,8 +1308,8 @@ class AudioWAV extends DataStream {
    *
    * A LIST chunk defines a list of sub-chunks and has the following format.
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk Data Blob
+   * @returns {object} The decoded values.
    * @static
    */
   static decodeLIST(chunk) {
@@ -1309,8 +1346,8 @@ class AudioWAV extends DataStream {
   /**
    * Decode the LIST INFO chunks.
    *
-   * @param {DataStream} list - List DataStream
-   * @returns {object} - The parsed list.
+   * @param {DataStream} list List DataStream
+   * @returns {object} The parsed list.
    */
   static decodeLISTINFO(list) {
     debug('decodeLISTINFO');
@@ -1319,8 +1356,11 @@ class AudioWAV extends DataStream {
       const info = {};
       // TODO: Switch for listID to have nice human labels for IDs
       info.id = list.readString(4);
+      debug('decodeLISTINFO chunk id:', info.id);
       info.size = list.readUInt32(true);
+      debug('decodeLISTINFO chunk size:', info.size);
       info.text = list.readString(info.size);
+      debug('decodeLISTINFO chunk text:', info.text);
       // All blocks must begin on an EVEN boundary and the block size MUST NOT include the padding byte, if required.
       if (info.size % 2 !== 0) {
         list.advance(1);
@@ -1474,6 +1514,42 @@ class AudioWAV extends DataStream {
     const data = fact.readUInt8();
     const value = { data };
     debug('decodeFACT =', JSON.stringify(value, null, 2));
+    return value;
+  }
+
+  /**
+   * Decode the DISP (Display) chunk.
+   *
+   * The DISP chunk should be used as a direct child of the RIFF chunk so that any RIFF aware application can find it.
+   * There can be multiple DISP chunks with each containing different types of displayable data, but all representative of the same object.
+   * The DISP chunks should be stored in the file in order of preference (just as in the clipboard).
+   *
+   * The DISP chunk is especially beneficial when representing OLE data within an application.
+   * For example, when pasting a wave file into Excel, the creating application can use the DISP chunk to associate an icon and a text description to represent the embedded wave file.
+   * This text should be short so that it can be easily displayed in menu bars and under icons.
+   * Note: do not use a CF_TEXT for a description of the data.
+   * Bibliographic data chunks will be added to support the standard MARC (Machine Readable Cataloging) data.
+   *
+   * @param {string | Buffer} chunk - Data Blob
+   * @returns {object} - The decoded values.
+   * @static
+   * @see {@link http://netghost.narod.ru/gff/vendspec/micriff/ms_riff.txt|New Multimedia Data Types and Data Techniques}
+   * @see {@link https://docs.microsoft.com/en-us/windows/win32/dataxchg/standard-clipboard-formats|Standard Clipboard Formats}
+   */
+  static decodeDISP(chunk) {
+    debug('decodeDISP');
+    const disp = DataStream.fromData(chunk);
+    const _chunkID = disp.readString(4);
+    const size = disp.readUInt32(true);
+    debug('decodeDISP size', size);
+
+    // Identifies the data as one of the standard Windows clipboard formats:
+    // CF_METAFILE, CF_DIB, CF_TEXT, etc. as defined in windows.h.
+    const type = disp.readUInt32(true);
+    const data = disp.readUInt16(true);
+
+    const value = { type, data };
+    debug('decodeDISP =', JSON.stringify(value, null, 2));
     return value;
   }
 
@@ -2102,13 +2178,15 @@ class AudioWAV extends DataStream {
    * When writing RIFFs, JUNK chunks should not have an odd Size.
    *
    * @param {string | Buffer} chunk - Data Blob
+   * @param {object} options Decoding options.
+   * @param {boolean} options.roundOddChunks When true we will round odd chunk sizes up to keep in spec.
    * @static
    */
-  static decodeJUNK(chunk) {
+  static decodeJUNK(chunk, options) {
     const junk = DataStream.fromData(chunk);
     const chunkID = junk.readString(4);
     let size = junk.readUInt32(true);
-    if (size % 2 !== 0) {
+    if (options.roundOddChunks && size % 2 !== 0) {
       size += 1;
     }
     debug(`decodeJUNK: ${chunk.length} bytes, chunkID: ${chunkID}, junk size: ${size}`);
@@ -2117,20 +2195,22 @@ class AudioWAV extends DataStream {
   /**
    * Decode the bext (Broadcast Wave Format (BWF) Broadcast Extension) chunk.
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk Data Blob
+   * @param {object} options Decoding options.
+   * @param {boolean} options.roundOddChunks When true we will round odd chunk sizes up to keep in spec.
+   * @returns {object} The decoded values.
    * @static
    * @see {@link https://sites.google.com/site/musicgapi/technical-documents/wav-file-format#cue|Cue Chunk}
    * @see {@link https://tech.ebu.ch/docs/tech/tech3285.pdf|Spec}
    */
-  static decodeBEXT(chunk) {
+  static decodeBEXT(chunk, options) {
     debug('decodeBEXT');
     const bext = DataStream.fromData(chunk);
     const chunkID = bext.readString(4);
     let size = bext.readUInt32(true);
 
     /* istanbul ignore next */
-    if (size % 2 !== 0) {
+    if (options.roundOddChunks && size % 2 !== 0) {
       size += 1;
     }
 
