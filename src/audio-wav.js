@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-const debug = require('debug')('Uttori.Utility.AudioWAV');
+let debug = () => {}; try { debug = require('debug')('Uttori.Utility.AudioWAV'); } catch {}
 const zlib = require('zlib');
 const { DataBuffer, DataBufferList, DataStream } = require('@uttori/data-tools');
 

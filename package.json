@@ -25,7 +25,9 @@
     "node": ">= 12"
   },
   "dependencies": {
-    "@uttori/data-tools": "^1.6.1",
+    "@uttori/data-tools": "^1.6.1"
+  },
+  "optionalDependencies": {
     "debug": "^4.3.1"
   },
   "devDependencies": {
