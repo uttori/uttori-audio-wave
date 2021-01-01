@@ -24,6 +24,7 @@ declare module "audio-wav" {
         static decodeLISTINFO(list: any): object;
         static decodeLISTadtl(list: any): object;
         static decodeDATA(chunk: string | Buffer): void;
+        static decodeTLST(chunk: string | Buffer): object;
         static decodeFACT(chunk: string | Buffer): object;
         static decodeACID(chunk: string | Buffer): object;
         static decodeINST(chunk: string | Buffer): object;

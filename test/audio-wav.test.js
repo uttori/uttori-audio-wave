@@ -224,3 +224,30 @@ test('AudioWAV.decodeChunk(): can decode a sample chunk (AM - Heaven (808).wav)'
   t.is(audio.chunks[3].type, 'sample');
   t.is(audio.chunks[4].type, 'list');
 });
+
+// https://www.yumpu.com/en/document/read/49734369/sound-forge-50-manualpdf page 362
+test('AudioWAV.decodeChunk(): can decode a `tlst` chunk and an edge case LIST adtl chunk (AM - Quick (Fill).wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/AM - Quick (Fill).wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 8);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'data');
+  t.is(audio.chunks[3].type, 'sample');
+  t.is(audio.chunks[4].type, 'cue_points');
+  t.is(audio.chunks[5].type, 'list');
+  t.is(audio.chunks[6].type, 'trigger_list');
+  t.deepEqual(audio.chunks[6].value, {
+    extra: 0,
+    extraData: 0,
+    function: 9452799,
+    list: 1,
+    name: 'cue ',
+    triggerOn1: 1,
+    triggerOn2: 0,
+    triggerOn3: 0,
+    triggerOn4: 0,
+    type: 0,
+  });
+  t.is(audio.chunks[7].type, 'list');
+});

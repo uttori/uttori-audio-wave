@@ -204,6 +204,13 @@ class AudioWAV extends DataStream {
         this.chunks.push({ type: 'sample', value, chunk });
         break;
       }
+      case 'tlst': {
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        const value = AudioWAV.decodeTLST(chunk);
+        this.chunks.push({ type: 'trigger_list', value, chunk });
+        break;
+      }
       case 'data': {
         this.rewind(8);
         const chunk = this.read(8 + size, true);
@@ -1342,10 +1349,13 @@ class AudioWAV extends DataStream {
           adtl.label = list.readString(adtl.size).trim();
           break;
         }
-        /* istanbul ignore next */
+        case 'ltxt': {
+          adtl.ltxt = list.readString(adtl.size).trim();
+          break;
+        }
         default: {
           debug(`Unknown ID: ${adtl.id}`);
-          this.advance(adtl.size);
+          list.advance(adtl.size);
         }
       }
       value.push(adtl);
@@ -1361,6 +1371,78 @@ class AudioWAV extends DataStream {
    */
   static decodeDATA(chunk) {
     debug(`decodeDATA: ${chunk.length} data bytes`);
+  }
+
+  /**
+   * Decode the `tlst` (Trigger List) chunk.
+   *
+   * Used in Sound Forge by Sonic Foundry
+   *
+   * Specifies a list of triggers which can be used to trigger playback of a series of cue points or Playlist entries.
+   *
+   * There's a historical bug in dwName (which is in fact an index, and the bug is that it's actually Index-1).
+   *
+   * @param {string | Buffer} chunk - Data Blob
+   * @returns {object} - The decoded values.
+   * @static
+   */
+  static decodeTLST(chunk) {
+    debug('decodeTLST');
+    const tlst = DataStream.fromData(chunk);
+    const _chunkID = tlst.readString(4);
+    const size = tlst.readUInt32(true);
+    debug('decodeTLST size', size);
+
+    // Specifies the list which this list entry references.
+    // References either `cue` or `playlist`.
+    const list = tlst.readUInt32(true);
+
+    // Cue Point Name / Playlist Entry by Index
+    const name = tlst.readString(4);
+
+    // Type of trigger:
+    // 0: SMPTE Trigger, 1: MIDI Command Trigger, 2: MIDI SySEx Trigger
+    const type = tlst.readUInt32(true);
+
+    // Specifies the value that will cause a trigger to be generated.
+    // The value will change value depending on the type of trigger.
+    // SMPTE: Hours
+    // MIDI Command: Channel
+    const triggerOn1 = tlst.readUInt8(true);
+    // SMPTE: Minues
+    // MIDI Command: Command
+    const triggerOn2 = tlst.readUInt8(true);
+    // SMPTE: Seconds
+    // MIDI Command: Param1
+    const triggerOn3 = tlst.readUInt8(true);
+    // SMPTE: Frames
+    // MIDI Command: Param2
+    const triggerOn4 = tlst.readUInt8(true);
+
+    // The function of this trigger.
+    // 0: Play, 1: Stop, 2: Queue
+    const func = tlst.readUInt32(true);
+
+    // Specifies the size of additional information.
+    // For the case of a MIDI SySx Trigger, this is the size of the matching MIDI SySxTrigger immediately following the structure.
+    const extra = tlst.readUInt32(true);
+
+    const extraData = tlst.readUInt32(true);
+
+    const value = {
+      list,
+      name,
+      type,
+      triggerOn1,
+      triggerOn2,
+      triggerOn3,
+      triggerOn4,
+      extra,
+      extraData,
+      function: func,
+    };
+    debug('decodeTLST =', JSON.stringify(value, null, 2));
+    return value;
   }
 
   /**
@@ -1385,7 +1467,8 @@ class AudioWAV extends DataStream {
     debug('decodeFACT');
     const fact = DataStream.fromData(chunk);
     const _chunkID = fact.readString(4);
-    const _size = fact.readUInt32(true);
+    const size = fact.readUInt32(true);
+    debug('decodeFACT size', size);
 
     // Various information about the contents of the file, depending on the compression code.
     const data = fact.readUInt8();

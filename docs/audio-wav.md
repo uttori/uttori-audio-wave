@@ -23,6 +23,7 @@ The WAVE file format is a subset of Microsoft's RIFF specification for the stora
         * [.decodeLISTINFO(list)](#AudioWAV.decodeLISTINFO) ⇒ <code>object</code>
         * [.decodeLISTadtl(list)](#AudioWAV.decodeLISTadtl) ⇒ <code>object</code>
         * [.decodeDATA(chunk)](#AudioWAV.decodeDATA)
+        * [.decodeTLST(chunk)](#AudioWAV.decodeTLST) ⇒ <code>object</code>
         * [.decodeFACT(chunk)](#AudioWAV.decodeFACT) ⇒ <code>object</code>
         * [.decodeACID(chunk)](#AudioWAV.decodeACID) ⇒ <code>object</code>
         * [.decodeINST(chunk)](#AudioWAV.decodeINST) ⇒ <code>object</code>
@@ -227,6 +228,24 @@ Decode the LIST adtl chunks.
 Decode the data (Audio Data) chunk.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+
+<a name="AudioWAV.decodeTLST"></a>
+
+### AudioWAV.decodeTLST(chunk) ⇒ <code>object</code>
+Decode the `tlst` (Trigger List) chunk.
+
+Used in Sound Forge by Sonic Foundry
+
+Specifies a list of triggers which can be used to trigger playback of a series of cue points or Playlist entries.
+
+There's a historical bug in dwName (which is in fact an index, and the bug is that it's actually Index-1).
+
+**Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+**Returns**: <code>object</code> - - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
