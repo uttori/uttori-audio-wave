@@ -179,3 +179,18 @@ test('AudioWAV.decodeResU(data): can read a valid ResU (Logic Pro X) chunk', (t)
   t.is(audio.chunks[4].type, 'logic_resu');
   t.is(audio.chunks[4].value.data.duration, 35.17240363);
 });
+
+test('AudioWAV.decodeChunk(): can decode an unknown chunk (AM - Dark (808).wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/AM - Dark (808).wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 9);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'fact');
+  t.is(audio.chunks[3].type, 'data');
+  t.is(audio.chunks[4].type, 'sample');
+  t.is(audio.chunks[5].type, 'instrument');
+  t.is(audio.chunks[6].type, 'acid');
+  t.is(audio.chunks[7].type, 'list');
+  t.is(audio.chunks[8].type, 'list');
+});

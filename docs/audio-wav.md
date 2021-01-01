@@ -23,6 +23,9 @@ The WAVE file format is a subset of Microsoft's RIFF specification for the stora
         * [.decodeLISTINFO(list)](#AudioWAV.decodeLISTINFO) ⇒ <code>object</code>
         * [.decodeLISTadtl(list)](#AudioWAV.decodeLISTadtl) ⇒ <code>object</code>
         * [.decodeDATA(chunk)](#AudioWAV.decodeDATA)
+        * [.decodeFACT(chunk)](#AudioWAV.decodeFACT) ⇒ <code>object</code>
+        * [.decodeINST(chunk)](#AudioWAV.decodeINST) ⇒ <code>object</code>
+        * [.decodeSMPL(chunk)](#AudioWAV.decodeSMPL) ⇒ <code>object</code>
         * [.decodeRLND(chunk)](#AudioWAV.decodeRLND) ⇒ <code>object</code>
         * [.encodeRLND(data)](#AudioWAV.encodeRLND) ⇒ <code>Buffer</code>
         * [.decodeJUNK(chunk)](#AudioWAV.decodeJUNK)
@@ -223,6 +226,58 @@ Decode the LIST adtl chunks.
 Decode the data (Audio Data) chunk.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+
+<a name="AudioWAV.decodeFACT"></a>
+
+### AudioWAV.decodeFACT(chunk) ⇒ <code>object</code>
+Decode the fact chunk.
+
+Fact chunks exist in all wave files that are compressed or that have a wave list chunk.
+A fact chunk is not required in an uncompressed PCM file that does not have a wave list chunk.
+
+According to the fact chunk's initial specification,
+the data portion of the fact chunk will contain only
+one 4-byte number that specifies the number of samples
+in the data chunk of the Wave file. This number,
+when combined with the samples per second value in
+the format chunk of the Wave file, can be used to
+compute the length of the audio data in seconds.
+
+**Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+**Returns**: <code>object</code> - - The decoded values.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+
+<a name="AudioWAV.decodeINST"></a>
+
+### AudioWAV.decodeINST(chunk) ⇒ <code>object</code>
+Decode the inst (Instrumet) chunk.
+
+When a wave file is used as wave samples in a MIDI synthesizer,
+the instrument chunk helps the MIDI synthesizer define the sample pitch & relative volume of the samples.
+
+**Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+**Returns**: <code>object</code> - - The decoded values.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+
+<a name="AudioWAV.decodeSMPL"></a>
+
+### AudioWAV.decodeSMPL(chunk) ⇒ <code>object</code>
+Decode the smpl (Sample) chunk.
+
+The sample chunk allows a MIDI sampler to use the Wave file as a collection of samples.
+
+**Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+**Returns**: <code>object</code> - - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |

@@ -170,12 +170,38 @@ class AudioWAV extends DataStream {
       throw new Error(`Invalid SubChunk Size: ${0xFFFFFFFF & size}`);
     }
 
+    // Size should be even.
+    if (size % 2 !== 0) {
+      size += 1;
+    }
+
     switch (type) {
       case 'fmt ': {
         this.rewind(8);
         const chunk = this.read(8 + size, true);
         const value = AudioWAV.decodeFMT(chunk);
         this.chunks.push({ type: 'format', value, chunk });
+        break;
+      }
+      case 'fact': {
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        const value = AudioWAV.decodeFACT(chunk);
+        this.chunks.push({ type: 'fact', value, chunk });
+        break;
+      }
+      case 'inst': {
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        const value = AudioWAV.decodeINST(chunk);
+        this.chunks.push({ type: 'instrument', value, chunk });
+        break;
+      }
+      case 'smpl': {
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        const value = AudioWAV.decodeSMPL(chunk);
+        this.chunks.push({ type: 'sample', value, chunk });
         break;
       }
       case 'data': {
@@ -204,10 +230,6 @@ class AudioWAV extends DataStream {
         break;
       }
       case 'JUNK': {
-        // Size should be even.
-        if (size % 2 !== 0) {
-          size += 1;
-        }
         this.rewind(8);
         const chunk = this.read(8 + size, true);
         AudioWAV.decodeJUNK(chunk);
@@ -222,11 +244,6 @@ class AudioWAV extends DataStream {
         break;
       }
       case 'bext': {
-        // Size should be even.
-        /* istanbul ignore next */
-        if (size % 2 !== 0) {
-          size += 1;
-        }
         this.rewind(8);
         const chunk = this.read(8 + size, true);
         const value = AudioWAV.decodeBEXT(chunk);
@@ -1337,6 +1354,219 @@ class AudioWAV extends DataStream {
    */
   static decodeDATA(chunk) {
     debug(`decodeDATA: ${chunk.length} data bytes`);
+  }
+
+  /**
+   * Decode the fact chunk.
+   *
+   * Fact chunks exist in all wave files that are compressed or that have a wave list chunk.
+   * A fact chunk is not required in an uncompressed PCM file that does not have a wave list chunk.
+   *
+   * According to the fact chunk's initial specification,
+   * the data portion of the fact chunk will contain only
+   * one 4-byte number that specifies the number of samples
+   * in the data chunk of the Wave file. This number,
+   * when combined with the samples per second value in
+   * the format chunk of the Wave file, can be used to
+   * compute the length of the audio data in seconds.
+   *
+   * @param {string | Buffer} chunk - Data Blob
+   * @returns {object} - The decoded values.
+   * @static
+   */
+  static decodeFACT(chunk) {
+    debug('decodeFACT');
+    const fact = DataStream.fromData(chunk);
+    const _chunkID = fact.readString(4);
+    const _size = fact.readUInt32(true);
+
+    // Various information about the contents of the file, depending on the compression code.
+    const data = fact.readUInt8();
+    const value = { data };
+    debug('decodeFACT =', JSON.stringify(value, null, 2));
+    return value;
+  }
+
+  /**
+   * Decode the inst (Instrumet) chunk.
+   *
+   * When a wave file is used as wave samples in a MIDI synthesizer,
+   * the instrument chunk helps the MIDI synthesizer define the sample pitch & relative volume of the samples.
+   *
+   * @param {string | Buffer} chunk - Data Blob
+   * @returns {object} - The decoded values.
+   * @static
+   */
+  static decodeINST(chunk) {
+    debug('decodeINST');
+    const inst = DataStream.fromData(chunk);
+    const _chunkID = inst.readString(4);
+    const size = inst.readUInt32(true);
+    debug('decodeINST size', size);
+
+    // The MIDI note that corresponds to the original (unshifted) pitch of the sample.
+    // This value is between 0 to 127.
+    const unshiftedNote = inst.readUInt8();
+
+    // Fine tuning of the pitch in cents. Values are between -50 to 50.
+    const fineTuning = inst.readUInt8();
+
+    // The volume setting (suggested) for the sample in decibels.
+    const gain = inst.readUInt8();
+
+    // The lowest usable MIDI note for the sample (suggested). This value is between 0 and 127.
+    const lowNote = inst.readUInt8();
+
+    // The highest usable MIDI note for the sample (suggested). This value is between 0 and 127.
+    const highNote = inst.readUInt8();
+
+    // The lowest usable MIDI velocity for the sample (suggested). This value is between 0 and 127.
+    const lowVelocity = inst.readUInt8();
+
+    // The highest usable MIDI velocity for the sample (suggested). This value is between 0 and 127.
+    const highVelocity = inst.readUInt8();
+
+    const value = {
+      unshiftedNote,
+      fineTuning,
+      gain,
+      lowNote,
+      highNote,
+      lowVelocity,
+      highVelocity,
+    };
+    debug('decodeINST =', JSON.stringify(value, null, 2));
+    return value;
+  }
+
+  /**
+   * Decode the smpl (Sample) chunk.
+   *
+   * The sample chunk allows a MIDI sampler to use the Wave file as a collection of samples.
+   *
+   * @param {string | Buffer} chunk - Data Blob
+   * @returns {object} - The decoded values.
+   * @static
+   */
+  static decodeSMPL(chunk) {
+    debug('decodeSMPL');
+    const smpl = DataStream.fromData(chunk);
+    const _chunkID = smpl.readString(4);
+    const _size = smpl.readUInt32(true);
+
+    // The MIDI Manufacturers Association manufacturer code (see MIDI System Exclusive message).
+    // A value of zero implies that there is no specific manufacturer.
+    // The first byte of the four bytes specifies the number of bytes in the manufacturer code that are relevant (1 or 3).
+    // For example, Roland would be specified as 0x01000041 (0x41), where as Microsoft would be 0x03000041 (0x00 0x00 0x41)
+    const manufacturer1 = smpl.readUInt8();
+    const manufacturer2 = smpl.readUInt8();
+    const manufacturer3 = smpl.readUInt8();
+    const manufacturer4 = smpl.readUInt8();
+
+    // The product / model ID of the target device, specific to the manufacturer.
+    // A value of zero means no specific product.
+    const product = smpl.readUInt32();
+
+    // The period of one sample in nanoseconds.
+    // For example, at the sampling rate 44.1 KHz the size of one sample is (1 / 44100) * 1,000,000,000 = 22675 nanoseconds = 0x00005893
+    const samplePeriod = smpl.readUInt32();
+
+    // The MIDI note that will play when this sample is played at its current pitch.
+    // The values are between 0 and 127.
+    const midiUnityNote = smpl.readUInt32();
+
+    // The fraction of a semitone up from the specified note.
+    // For example, one-half semitone is 50 cents and will be specified as 0x80.
+    const midiPitchFraction = smpl.readUInt32();
+
+    // The SMPTE format. Possible values are 0, 24, 25, 29, and 30.
+    const SMPTEFormat = smpl.readUInt32();
+
+    // Specifies a time offset for the sample, if the sample should start at a later time and not immediately.
+    // The first byte of this value specifies the number of hours and is in between -23 and 23.
+    // The second byte is the number of minutes and is between 0 and 59.
+    // he third byte is the number of seconds (0 to 59).
+    // The last byte is the number of frames and is between 0 and the frames specified by the SMPTE format.
+    // For example, if the SMPTE format is 24, then the number of frames is between 0 and 23
+    const SMPTEOffset = smpl.readUInt32();
+
+    // Specifies the number of sample loops that are contained in this chunk's data.
+    const sampleLoopsCount = smpl.readUInt32();
+
+    // The number of bytes of optional sampler specific data that follows the sample loops.
+    const sampleDataSize = smpl.readUInt32();
+
+    // Sample Loops
+    const sampleLoops = [];
+    /* istanbul ignore next */
+    if (sampleLoopsCount > 0) {
+      for (let i = 0; i < sampleLoopsCount; i++) {
+        // A unique ID of the loop, which could be a cue point.
+        const ID = smpl.readUInt32();
+
+        // A type of 0 means normal forward looping type.
+        // A value of 1 means alternating (forward and backward) looping type.
+        // A value of 2 means backward looping type.
+        // The values 3-31 are reserved for future standard types.
+        // The values 32 and above are sampler / manufacturer specific types.
+        const type = smpl.readUInt32();
+
+        // The start point of the loop in samples.
+        const start = smpl.readUInt32();
+
+        // he end point of the loop in samples.
+        // The end sample is also played.
+        const end = smpl.readUInt32();
+
+        // The resolution at which this loop should be fine tuned.
+        // A value of zero means current resolution.
+        // A value of 50 cents (0x80) means 1/2 sample.
+        const fraction = smpl.readUInt32();
+
+        // The number of times to play the loop.
+        // A value of zero means infinitely
+        //  In a MIDI sampler that may mean infinite sustain.
+        const count = smpl.readUInt32();
+        sampleLoops.push({
+          ID,
+          type,
+          start,
+          end,
+          fraction,
+          count,
+        });
+      }
+    }
+
+    // If there is no such data, the number of bytes is zero.
+    let sampleData;
+    /* istanbul ignore next */
+    if (sampleDataSize > 0) {
+      sampleData = smpl.read(sampleDataSize, true);
+    }
+
+    // The sample loops
+    // const sampleLoops =
+    // This sampler specific data is optional
+    // samplerSpecificData
+
+    const value = {
+      manufacturer1,
+      manufacturer2,
+      manufacturer3,
+      manufacturer4,
+      product,
+      samplePeriod,
+      midiUnityNote,
+      midiPitchFraction,
+      SMPTEFormat,
+      SMPTEOffset,
+      sampleLoopsCount,
+      sampleDataSize,
+      sampleData,
+    };
+    debug('decodeSMPL =', JSON.stringify(value, null, 2));
+    return value;
   }
 
   /**
