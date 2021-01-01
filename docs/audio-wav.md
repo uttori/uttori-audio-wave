@@ -24,6 +24,7 @@ The WAVE file format is a subset of Microsoft's RIFF specification for the stora
         * [.decodeLISTadtl(list)](#AudioWAV.decodeLISTadtl) ⇒ <code>object</code>
         * [.decodeDATA(chunk)](#AudioWAV.decodeDATA)
         * [.decodeFACT(chunk)](#AudioWAV.decodeFACT) ⇒ <code>object</code>
+        * [.decodeACID(chunk)](#AudioWAV.decodeACID) ⇒ <code>object</code>
         * [.decodeINST(chunk)](#AudioWAV.decodeINST) ⇒ <code>object</code>
         * [.decodeSMPL(chunk)](#AudioWAV.decodeSMPL) ⇒ <code>object</code>
         * [.decodeRLND(chunk)](#AudioWAV.decodeRLND) ⇒ <code>object</code>
@@ -246,6 +247,24 @@ in the data chunk of the Wave file. This number,
 when combined with the samples per second value in
 the format chunk of the Wave file, can be used to
 compute the length of the audio data in seconds.
+
+**Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+**Returns**: <code>object</code> - - The decoded values.  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+
+<a name="AudioWAV.decodeACID"></a>
+
+### AudioWAV.decodeACID(chunk) ⇒ <code>object</code>
+ACID Loop File Format
+
+They were originally created for use with Acid, the loop-based, music-sequencing software, created by Sonic Foundry in 1998.
+
+"Acidized" loops contain tempo and key information, so that Acid and other programs that can read the "acidization" can properly time stretch and pitch shift them.
+
+Although the phrase "ACID loops" technically only refers to loops which have been "acidized", some people use the term to refer to loops in general, even when used with other software packages.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
 **Returns**: <code>object</code> - - The decoded values.  

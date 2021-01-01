@@ -180,7 +180,7 @@ test('AudioWAV.decodeResU(data): can read a valid ResU (Logic Pro X) chunk', (t)
   t.is(audio.chunks[4].value.data.duration, 35.17240363);
 });
 
-test('AudioWAV.decodeChunk(): can decode an unknown chunk (AM - Dark (808).wav)', (t) => {
+test('AudioWAV.decodeChunk(): can decode an acid & instrument chunk (AM - Dark (808).wav)', (t) => {
   const data = fs.readFileSync('./test/assets/AM - Dark (808).wav');
   const audio = AudioWAV.fromFile(data);
   t.is(audio.chunks.length, 9);
@@ -190,7 +190,37 @@ test('AudioWAV.decodeChunk(): can decode an unknown chunk (AM - Dark (808).wav)'
   t.is(audio.chunks[3].type, 'data');
   t.is(audio.chunks[4].type, 'sample');
   t.is(audio.chunks[5].type, 'instrument');
+  t.deepEqual(audio.chunks[5].value, {
+    unshiftedNote: 60,
+    fineTuning: 0,
+    gain: 0,
+    lowNote: 0,
+    highNote: 127,
+    lowVelocity: 0,
+    highVelocity: 127,
+  });
   t.is(audio.chunks[6].type, 'acid');
+  t.deepEqual(audio.chunks[6].value, {
+    beats: 12,
+    meterDenominator: 4,
+    meterNumerator: 4,
+    rootNote: 60,
+    tempo: 0,
+    type: 1,
+    unknown1: 128,
+    unknown2: 0,
+  });
   t.is(audio.chunks[7].type, 'list');
   t.is(audio.chunks[8].type, 'list');
+});
+
+test('AudioWAV.decodeChunk(): can decode a sample chunk (AM - Heaven (808).wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/AM - Heaven (808).wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 5);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'data');
+  t.is(audio.chunks[3].type, 'sample');
+  t.is(audio.chunks[4].type, 'list');
 });

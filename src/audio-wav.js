@@ -236,6 +236,13 @@ class AudioWAV extends DataStream {
         this.chunks.push({ type: 'junk', chunk });
         break;
       }
+      case 'acid': {
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        const value = AudioWAV.decodeACID(chunk);
+        this.chunks.push({ type: 'acid', value, chunk });
+        break;
+      }
       case 'cue ': {
         this.rewind(8);
         const chunk = this.read(8 + size, true);
@@ -268,7 +275,7 @@ class AudioWAV extends DataStream {
         debug(`Unsupported Chunk: '${type}' with ${size} bytes`);
         this.rewind(8);
         const chunk = this.read(8 + size, true);
-        this.chunks.push({ type, chunk });
+        this.chunks.push({ type, chunk, unknown: true });
         break;
       }
     }
@@ -1388,6 +1395,69 @@ class AudioWAV extends DataStream {
   }
 
   /**
+   *  ACID Loop File Format
+   *
+   * They were originally created for use with Acid, the loop-based, music-sequencing software, created by Sonic Foundry in 1998.
+   *
+   * "Acidized" loops contain tempo and key information, so that Acid and other programs that can read the "acidization" can properly time stretch and pitch shift them.
+   *
+   * Although the phrase "ACID loops" technically only refers to loops which have been "acidized", some people use the term to refer to loops in general, even when used with other software packages.
+   *
+   * @static
+   * @param {string | Buffer} chunk - Data Blob
+   * @returns {object} - The decoded values.
+   * @memberof AudioWAV
+   */
+  static decodeACID(chunk) {
+    debug('decodeACID');
+    const acid = DataStream.fromData(chunk);
+    const _chunkID = acid.readString(4);
+    const size = acid.readUInt32(true);
+    debug('decodeACID size', size);
+
+    // Type of file, appears to be a bit mask, however some combinations are probably impossible and/or qualified as "errors"
+    // 0x01 On: One Shot         Off: Loop
+    // 0x02 On: Root note is Set Off: No root
+    // 0x04 On: Stretch is On,   Off: Strech is OFF
+    // 0x08 On: Disk Based       Off: Ram based
+    // 0x10 On: ??????????       Off: ????????? (Acidizer puts that ON)
+    const type = acid.readUInt32(true);
+
+    // Root Note
+    // When type `0x10` is OFF : [C,C#,(...),B] -> [0x30 to 0x3B]
+    // When type `0x10` is ON  : [C,C#,(...),B] -> [0x3C to 0x47]
+    const rootNote = acid.readUInt16(true);
+
+    const unknown1 = acid.readUInt16(true);
+    const unknown2 = acid.readUInt32(true);
+
+    // Number of beats
+    const beats = acid.readUInt32(true);
+
+    // Meter Denominator, like the 4 in 5/4
+    const meterDenominator = acid.readUInt16(true);
+
+    // Meter Numerator, like the 3 in 3/4
+    const meterNumerator = acid.readUInt16(true);
+
+    // Tempo
+    const tempo = acid.readUInt32(true);
+
+    const value = {
+      type,
+      rootNote,
+      unknown1,
+      unknown2,
+      beats,
+      meterDenominator,
+      meterNumerator,
+      tempo,
+    };
+    debug('decodeACID =', JSON.stringify(value, null, 2));
+    return value;
+  }
+
+  /**
    * Decode the inst (Instrumet) chunk.
    *
    * When a wave file is used as wave samples in a MIDI synthesizer,
@@ -1452,7 +1522,8 @@ class AudioWAV extends DataStream {
     debug('decodeSMPL');
     const smpl = DataStream.fromData(chunk);
     const _chunkID = smpl.readString(4);
-    const _size = smpl.readUInt32(true);
+    const size = smpl.readUInt32(true);
+    debug('decodeSMPL size', size);
 
     // The MIDI Manufacturers Association manufacturer code (see MIDI System Exclusive message).
     // A value of zero implies that there is no specific manufacturer.
@@ -1465,22 +1536,22 @@ class AudioWAV extends DataStream {
 
     // The product / model ID of the target device, specific to the manufacturer.
     // A value of zero means no specific product.
-    const product = smpl.readUInt32();
+    const product = smpl.readUInt8();
 
     // The period of one sample in nanoseconds.
     // For example, at the sampling rate 44.1 KHz the size of one sample is (1 / 44100) * 1,000,000,000 = 22675 nanoseconds = 0x00005893
-    const samplePeriod = smpl.readUInt32();
+    const samplePeriod = smpl.readUInt8();
 
     // The MIDI note that will play when this sample is played at its current pitch.
     // The values are between 0 and 127.
-    const midiUnityNote = smpl.readUInt32();
+    const midiUnityNote = smpl.readUInt8();
 
     // The fraction of a semitone up from the specified note.
     // For example, one-half semitone is 50 cents and will be specified as 0x80.
-    const midiPitchFraction = smpl.readUInt32();
+    const midiPitchFraction = smpl.readUInt8();
 
     // The SMPTE format. Possible values are 0, 24, 25, 29, and 30.
-    const SMPTEFormat = smpl.readUInt32();
+    const SMPTEFormat = smpl.readUInt8();
 
     // Specifies a time offset for the sample, if the sample should start at a later time and not immediately.
     // The first byte of this value specifies the number of hours and is in between -23 and 23.
@@ -1488,45 +1559,49 @@ class AudioWAV extends DataStream {
     // he third byte is the number of seconds (0 to 59).
     // The last byte is the number of frames and is between 0 and the frames specified by the SMPTE format.
     // For example, if the SMPTE format is 24, then the number of frames is between 0 and 23
-    const SMPTEOffset = smpl.readUInt32();
+    const SMPTEOffset1 = smpl.readUInt8();
+    const SMPTEOffset2 = smpl.readUInt8();
+    const SMPTEOffset3 = smpl.readUInt8();
+    const SMPTEOffset4 = smpl.readUInt8();
 
     // Specifies the number of sample loops that are contained in this chunk's data.
-    const sampleLoopsCount = smpl.readUInt32();
+    const sampleLoopsCount = smpl.readUInt8();
 
     // The number of bytes of optional sampler specific data that follows the sample loops.
-    const sampleDataSize = smpl.readUInt32();
+    const sampleDataSize = smpl.readUInt8();
 
     // Sample Loops
     const sampleLoops = [];
     /* istanbul ignore next */
     if (sampleLoopsCount > 0) {
+      debug('decodeSMPL sampleLoopsCount', sampleLoopsCount);
       for (let i = 0; i < sampleLoopsCount; i++) {
         // A unique ID of the loop, which could be a cue point.
-        const ID = smpl.readUInt32();
+        const ID = smpl.readUInt8();
 
         // A type of 0 means normal forward looping type.
         // A value of 1 means alternating (forward and backward) looping type.
         // A value of 2 means backward looping type.
         // The values 3-31 are reserved for future standard types.
         // The values 32 and above are sampler / manufacturer specific types.
-        const type = smpl.readUInt32();
+        const type = smpl.readUInt8();
 
         // The start point of the loop in samples.
-        const start = smpl.readUInt32();
+        const start = smpl.readUInt8();
 
         // he end point of the loop in samples.
         // The end sample is also played.
-        const end = smpl.readUInt32();
+        const end = smpl.readUInt8();
 
         // The resolution at which this loop should be fine tuned.
         // A value of zero means current resolution.
         // A value of 50 cents (0x80) means 1/2 sample.
-        const fraction = smpl.readUInt32();
+        const fraction = smpl.readUInt8();
 
         // The number of times to play the loop.
         // A value of zero means infinitely
         //  In a MIDI sampler that may mean infinite sustain.
-        const count = smpl.readUInt32();
+        const count = smpl.readUInt8();
         sampleLoops.push({
           ID,
           type,
@@ -1560,7 +1635,10 @@ class AudioWAV extends DataStream {
       midiUnityNote,
       midiPitchFraction,
       SMPTEFormat,
-      SMPTEOffset,
+      SMPTEOffset1,
+      SMPTEOffset2,
+      SMPTEOffset3,
+      SMPTEOffset4,
       sampleLoopsCount,
       sampleDataSize,
       sampleData,
@@ -2032,9 +2110,11 @@ class AudioWAV extends DataStream {
     const cue = DataStream.fromData(chunk);
     const chunkID = cue.readString(4);
     const size = cue.readUInt32(true);
+    debug('decodeCue size', size);
 
     // This value specifies the number of following cue points in this chunk.
     const numberCuePoints = cue.readUInt32(true);
+    debug('decodeCue numberCuePoints', numberCuePoints);
 
     const value = {
       chunkID,

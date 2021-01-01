@@ -12,6 +12,22 @@
 
 Utility for reading, parsing and basic encoding for Waveform Audio File Format (WAVE / WAV) files.
 
+AudioWAV supports parsing the following WAVE chunks:
+
+- `acid` - ACID Loop Chunk
+- `bext` - Broadcast Wave Format (BWF) Broadcast Extension Chunk
+- `cue ` - Cue Points Chunk
+- `data` - Audio Data Chunk
+- `ds64` - DataSize 64 Chunk
+- `fact` - Additional Data Chunk
+- `fmt ` - Format Chunk
+- `inst` - Instrument Chunk
+- `JUNK` - Garbage Chunks
+- `LIST` - LIST Information Chunk
+- `ResU` - Logic Pro X Chunk
+- `RLND` - Roland Sampler Chunk (Encode Avaliable)
+- `smpl` - Sample Chunk
+
 ## Install
 
 ```bash
