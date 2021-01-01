@@ -299,3 +299,19 @@ test('AudioWAV.decodeChunk(): can recover from a bad chunk (Bell.wav)', (t) => {
   t.is(audio.chunks[9].type, 'ID3 ');
   t.is(audio.chunks[10].type, 'list');
 });
+
+// Weird `muma` chunk, MAGIX AG related?
+test('AudioWAV.decodeChunk(): can recover from a bad chunk (Scream_FX_1.wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/Scream_FX_1.wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 11);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'data');
+  t.is(audio.chunks[3].type, 'acid');
+  t.is(audio.chunks[4].type, 'sample');
+  t.is(audio.chunks[5].type, 'cue_points');
+  t.is(audio.chunks[6].type, 'list');
+  t.is(audio.chunks[7].type, 'list');
+  t.is(audio.chunks[8].type, 'muma');
+});
