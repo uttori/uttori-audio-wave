@@ -1,6 +1,6 @@
 {
   "name": "@uttori/audio-wave",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Utility for reading & wrtiing WAV audio files.",
   "author": "Matthew Callis <matthew.callis@gmail.com>",
   "contributors": [],
