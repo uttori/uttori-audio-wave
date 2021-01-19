@@ -10,7 +10,7 @@
 
 # Uttori AudioWAV
 
-Utility for reading, parsing and basic encoding for Waveform Audio File Format (WAVE / WAV) files.
+Utility for reading, parsing and basic encoding for Waveform Audio File Format (WAVE / WAV) files. Check out [the demo](https://uttori.github.io/uttori-audio-wave/) to explore the chunks for a given WAV file in the browser.
 
 AudioWAV supports parsing the following WAVE chunks:
 
