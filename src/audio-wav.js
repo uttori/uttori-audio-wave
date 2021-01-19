@@ -63,7 +63,7 @@ class AudioWAV extends DataStream {
   /**
    * Creates a new AudioWAV from a DataBuffer.
    *
-   * @param {DataBuffer} buffer - The DataBuffer of the image to process.
+   * @param {DataBuffer} buffer The DataBuffer of the image to process.
    * @param {object} options Options for returned AudioWAV instance.
    * @returns {AudioWAV} the new AudioWAV instance for the provided DataBuffer
    * @static
@@ -104,8 +104,8 @@ class AudioWAV extends DataStream {
    * Signature (ASCII): [R, I, F, F, ..., ..., ..., ..., W, A, V, E]
    *
    * @static
-   * @param {string|Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string|Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
    * @throws {Error} Invalid WAV header
    */
   static decodeHeader(chunk) {
@@ -143,7 +143,7 @@ class AudioWAV extends DataStream {
    * @param {string} [data.riff='RIFF'] - RIFF Header, should contains the string `RIFF`, `RF64`, or `BW64` in ASCII form.
    * @param {number} data.size - This is the size of the entire file in bytes minus 8 bytes for the 2 fields not included in this count. RF64 sets this to -1 = 0xFFFFFFFF as it doesn't use this to support larger sizes in the DS64 chunk.
    * @param {string} [data.format='WAVE'] - WAVE Header, the string `WAVE` in ASCII form.
-   * @returns {Buffer} - The newley encoded header chunk.
+   * @returns {Buffer} The newley encoded header chunk.
    * @static
    */
   static encodeHeader(data) {
@@ -338,8 +338,8 @@ class AudioWAV extends DataStream {
    * [Extra Param Size]  2 bytes
    * [Extra Params]      n bytes
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
    * @static
    */
   static decodeFMT(chunk) {
@@ -1237,7 +1237,7 @@ class AudioWAV extends DataStream {
    * @param {number} [data.bitsPerSample=16] - 8 bits = 8, 16 bits = 16, etc.
    * @param {number} [data.extraParamSiz=0] - The size of the extra paramteres to follow, or 0.
    * @param {number} [data.extraParams=0] - Any extra data to encode.
-   * @returns {Buffer} - The newley encoded `fmt ` chunk.
+   * @returns {Buffer} The newley encoded `fmt ` chunk.
    * @static
    */
   static encodeFMT(data = {}) {
@@ -1366,7 +1366,7 @@ class AudioWAV extends DataStream {
    * Decode the LIST adtl chunks.
    *
    * @param {DataStream} list - List DataStream
-   * @returns {object} - The parsed list.
+   * @returns {object} The parsed list.
    */
   static decodeLISTadtl(list) {
     debug('decodeLISTadtl');
@@ -1398,7 +1398,7 @@ class AudioWAV extends DataStream {
   /**
    * Decode the data (Audio Data) chunk.
    *
-   * @param {string | Buffer} chunk - Data Blob
+   * @param {string | Buffer} chunk  Data Blob
    * @static
    */
   static decodeDATA(chunk) {
@@ -1414,8 +1414,8 @@ class AudioWAV extends DataStream {
    *
    * There's a historical bug in dwName (which is in fact an index, and the bug is that it's actually Index-1).
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
    * @static
    */
   static decodeTLST(chunk) {
@@ -1491,8 +1491,8 @@ class AudioWAV extends DataStream {
    * the format chunk of the Wave file, can be used to
    * compute the length of the audio data in seconds.
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
    * @static
    */
   static decodeFACT(chunk) {
@@ -1522,8 +1522,8 @@ class AudioWAV extends DataStream {
    * Note: do not use a CF_TEXT for a description of the data.
    * Bibliographic data chunks will be added to support the standard MARC (Machine Readable Cataloging) data.
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
    * @static
    * @see {@link http://netghost.narod.ru/gff/vendspec/micriff/ms_riff.txt|New Multimedia Data Types and Data Techniques}
    * @see {@link https://docs.microsoft.com/en-us/windows/win32/dataxchg/standard-clipboard-formats|Standard Clipboard Formats}
@@ -1555,8 +1555,8 @@ class AudioWAV extends DataStream {
    * Although the phrase "ACID loops" technically only refers to loops which have been "acidized", some people use the term to refer to loops in general, even when used with other software packages.
    *
    * @static
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
    * @memberof AudioWAV
    */
   static decodeACID(chunk) {
@@ -1614,8 +1614,8 @@ class AudioWAV extends DataStream {
    * When a wave file is used as wave samples in a MIDI synthesizer,
    * the instrument chunk helps the MIDI synthesizer define the sample pitch & relative volume of the samples.
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
    * @static
    */
   static decodeINST(chunk) {
@@ -1665,8 +1665,8 @@ class AudioWAV extends DataStream {
    *
    * The sample chunk allows a MIDI sampler to use the Wave file as a collection of samples.
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
    * @static
    */
   static decodeSMPL(chunk) {
@@ -1805,8 +1805,8 @@ class AudioWAV extends DataStream {
    *
    * This chunk is sized and padded with zeros to ensure that the the sample data starts exactly at offset 512.
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
    * @static
    */
   static decodeRLND(chunk) {
@@ -1992,7 +1992,7 @@ class AudioWAV extends DataStream {
    * @param {number} [data.unknown3=0] - Unknown, SP-404SX Wave Converter v1.01 on macOS sets this value to `0x00`.
    * @param {number} [data.unknown4=0] - Unknown, SP-404SX Wave Converter v1.01 on macOS sets this value to `0x00`.
    * @param {number|string} data.sampleIndex - The pad the sample plays on, between `0` and `119` as a number or the pad label, `A1` - `J12`. Only the SP404SX (device === `roifspsx`) provided values can be converted from string corrently, and if it is not found it will defailt to `0` / `A1`.
-   * @returns {Buffer} - The new RLND chunk.
+   * @returns {Buffer} The new RLND chunk.
    * @static
    * @see {@link https://www.roland.com/global/support/by_product/sp-404sx/updates_drivers/|SP-404SX Support Page}
    */
@@ -2169,7 +2169,7 @@ class AudioWAV extends DataStream {
    * The contents are to be skipped when reading.
    * When writing RIFFs, JUNK chunks should not have an odd Size.
    *
-   * @param {string | Buffer} chunk - Data Blob
+   * @param {string | Buffer} chunk  Data Blob
    * @param {object} options Decoding options.
    * @param {boolean} options.roundOddChunks When true we will round odd chunk sizes up to keep in spec.
    * @static
@@ -2255,8 +2255,8 @@ class AudioWAV extends DataStream {
    * The cue chunk is optional and if included, a single cue chunk should specify all cue points for the "WAVE" chunk.
    * No more than one cue chunk is allowed in a "WAVE" chunk.
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string | Buffer} chunk Data Blob
+   * @returns {object} The decoded values.
    * @static
    * @see {@link https://sites.google.com/site/musicgapi/technical-documents/wav-file-format#cue|Cue Chunk}
    */
@@ -2326,8 +2326,8 @@ class AudioWAV extends DataStream {
   /**
    * Decode the 'ResU' chunk, a ZIP compressed JSON Data containg Time Signature, Tempo and other data for Logic Pro X.
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string|Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
    * @static
    */
   static decodeResU(chunk) {
@@ -2364,8 +2364,8 @@ class AudioWAV extends DataStream {
   /**
    * DataSize 64 Parsing
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
+   * @param {string|Buffer} chunk Data Blob
+   * @returns {object} The decoded values.
    * @see {@link https://tech.ebu.ch/docs/tech/tech3306v1_0.pdf|RF64: An extended File Format for Audio}
    * @static
    */

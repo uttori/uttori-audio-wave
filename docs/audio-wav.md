@@ -117,7 +117,7 @@ Signature (Hexadecimal): [52, 49, 46, 46, ..., ..., ..., ..., 57, 41, 56, 45]
 Signature (ASCII): [R, I, F, F, ..., ..., ..., ..., W, A, V, E]
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 **Throws**:
 
 - <code>Error</code> Invalid WAV header
@@ -133,7 +133,7 @@ Signature (ASCII): [R, I, F, F, ..., ..., ..., ..., W, A, V, E]
 Enocdes JSON values to a valid Wave Header chunk Buffer.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>Buffer</code> - - The newley encoded header chunk.  
+**Returns**: <code>Buffer</code> - The newley encoded header chunk.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -158,7 +158,7 @@ Bits per Sample     2 bytes
 [Extra Params]      n bytes
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -174,7 +174,7 @@ Defaults are set to Red Book Compact Disc Digital Audio (CDDA or CD-DA) / Audio 
 RF64 specific fields are currently unsupported.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>Buffer</code> - - The newley encoded `fmt ` chunk.  
+**Returns**: <code>Buffer</code> - The newley encoded `fmt ` chunk.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
@@ -220,7 +220,7 @@ Decode the LIST INFO chunks.
 Decode the LIST adtl chunks.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The parsed list.  
+**Returns**: <code>object</code> - The parsed list.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -249,7 +249,7 @@ Specifies a list of triggers which can be used to trigger playback of a series o
 There's a historical bug in dwName (which is in fact an index, and the bug is that it's actually Index-1).
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -272,7 +272,7 @@ the format chunk of the Wave file, can be used to
 compute the length of the audio data in seconds.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -294,7 +294,7 @@ Note: do not use a CF_TEXT for a description of the data.
 Bibliographic data chunks will be added to support the standard MARC (Machine Readable Cataloging) data.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 **See**
 
 - [New Multimedia Data Types and Data Techniques](http://netghost.narod.ru/gff/vendspec/micriff/ms_riff.txt)
@@ -317,7 +317,7 @@ They were originally created for use with Acid, the loop-based, music-sequencing
 Although the phrase "ACID loops" technically only refers to loops which have been "acidized", some people use the term to refer to loops in general, even when used with other software packages.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -332,7 +332,7 @@ When a wave file is used as wave samples in a MIDI synthesizer,
 the instrument chunk helps the MIDI synthesizer define the sample pitch & relative volume of the samples.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -346,7 +346,7 @@ Decode the smpl (Sample) chunk.
 The sample chunk allows a MIDI sampler to use the Wave file as a collection of samples.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -362,7 +362,7 @@ Useful for use on SP-404 / SP-404SX / SP-404A samplers, perhaps others.
 This chunk is sized and padded with zeros to ensure that the the sample data starts exactly at offset 512.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -380,7 +380,7 @@ The unknown value may be an unsigned 32bit integer.
 This chunk is sized and padded with zeros to ensure that the the sample data starts exactly at offset 512.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>Buffer</code> - - The new RLND chunk.  
+**Returns**: <code>Buffer</code> - The new RLND chunk.  
 **See**: [SP-404SX Support Page](https://www.roland.com/global/support/by_product/sp-404sx/updates_drivers/)  
 
 | Param | Type | Default | Description |
@@ -440,7 +440,7 @@ The cue chunk is optional and if included, a single cue chunk should specify all
 No more than one cue chunk is allowed in a "WAVE" chunk.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 **See**: [Cue Chunk](https://sites.google.com/site/musicgapi/technical-documents/wav-file-format#cue)  
 
 | Param | Type | Description |
@@ -453,7 +453,7 @@ No more than one cue chunk is allowed in a "WAVE" chunk.
 Decode the 'ResU' chunk, a ZIP compressed JSON Data containg Time Signature, Tempo and other data for Logic Pro X.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -465,7 +465,7 @@ Decode the 'ResU' chunk, a ZIP compressed JSON Data containg Time Signature, Tem
 DataSize 64 Parsing
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>object</code> - - The decoded values.  
+**Returns**: <code>object</code> - The decoded values.  
 **See**: [RF64: An extended File Format for Audio](https://tech.ebu.ch/docs/tech/tech3306v1_0.pdf)  
 
 | Param | Type | Description |
