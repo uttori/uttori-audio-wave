@@ -5055,7 +5055,7 @@ const makeDetail = (key, value, keyClass = '', valueClass = '') => {
   detail.append(valueNode);
   return detail;
 };
-const known = ['header', 'format', 'list', 'data', 'roland', 'display', 'broadcast_extension', 'logic_resu', 'cue_points', 'sample', 'instrument', 'data_size_64', 'acid'];
+const known = ['header', 'format', 'list', 'data', 'roland', 'display', 'broadcast_extension', 'logic_resu', 'cue_points', 'sample', 'instrument', 'trigger_list', 'data_size_64', 'acid'];
 const labelType = 'Chunk Type:';
 const renderChunk = chunk => {
   const chunkNode = document.createElement('div');
