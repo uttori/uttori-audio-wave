@@ -66,13 +66,12 @@ Parse the WAV file, decoding the supported chunks.
 
 ### audioWAV.decodeChunk() ⇒ <code>string</code>
 Decodes the chunk type, and attempts to parse that chunk if supported.
-Supported Chunk Types: IHDR, PLTE, IDAT, IEND, tRNS, pHYs
+Supported Chunk Types: `fmt `, `fact`, `inst`, `DISP`, `smpl`, `tlst`, `data`, `LIST`, `RLND`, `JUNK`, `acid`, `cue `, `bext`, `ResU`, `ds64`, `cart`
 
 Chunk Structure:
-Length: 4 bytes
-Type:   4 bytes (IHDR, PLTE, IDAT, IEND, etc.)
+Length: 4 bytes (integer)
+Type:   4 bytes (string)
 Chunk:  {length} bytes
-CRC:    4 bytes
 
 **Kind**: instance method of [<code>AudioWAV</code>](#AudioWAV)  
 **Returns**: <code>string</code> - Chunk Type  
@@ -111,6 +110,7 @@ Creates a new AudioWAV from a DataBuffer.
 
 ### AudioWAV.decodeHeader(chunk) ⇒ <code>object</code>
 Decodes and validates WAV Header.
+Checks for `RIFF` / `RF64` / `BW64` header, reads the size, and then checks for the `WAVE header.
 
 Signature (Decimal): [82, 73, 70, 70, ..., ..., ..., ..., 87, 65, 86, 69]
 Signature (Hexadecimal): [52, 49, 46, 46, ..., ..., ..., ..., 57, 41, 56, 45]
@@ -120,7 +120,7 @@ Signature (ASCII): [R, I, F, F, ..., ..., ..., ..., W, A, V, E]
 **Returns**: <code>object</code> - - The decoded values.  
 **Throws**:
 
-- <code>Error</code> Invalid WAV header, expected 'WAVE'
+- <code>Error</code> Invalid WAV header
 
 
 | Param | Type | Description |
@@ -133,14 +133,14 @@ Signature (ASCII): [R, I, F, F, ..., ..., ..., ..., W, A, V, E]
 Enocdes JSON values to a valid Wave Header chunk Buffer.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
-**Returns**: <code>Buffer</code> - - The newley encoded `fmt ` chunk.  
+**Returns**: <code>Buffer</code> - - The newley encoded header chunk.  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
 | data | <code>object</code> |  | The values to encode to the header chunk chunk. |
 | [data.riff] | <code>string</code> | <code>&quot;&#x27;RIFF&#x27;&quot;</code> | RIFF Header, should contains the string `RIFF`, `RF64`, or `BW64` in ASCII form. |
 | data.size | <code>number</code> |  | This is the size of the entire file in bytes minus 8 bytes for the 2 fields not included in this count. RF64 sets this to -1 = 0xFFFFFFFF as it doesn't use this to support larger sizes in the DS64 chunk. |
-| [data.format] | <code>string</code> | <code>&quot;&#x27;WAVE&#x27;&quot;</code> | Contains the string `WAVE` in ASCII form |
+| [data.format] | <code>string</code> | <code>&quot;&#x27;WAVE&#x27;&quot;</code> | WAVE Header, the string `WAVE` in ASCII form. |
 
 <a name="AudioWAV.decodeFMT"></a>
 

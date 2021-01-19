@@ -49,6 +49,7 @@
     "import/no-dynamic-require": 0,
     "max-classes-per-file": 0,
     "max-len": 0,
+    "no-bitwise": 0,
     "no-empty": ["error", { "allowEmptyCatch": true }],
     "no-inferred-method-name/no-inferred-method-name": "error",
     "no-param-reassign": 0,

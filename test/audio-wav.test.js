@@ -46,7 +46,7 @@ test('AudioWAV.decodeHeader(): can detect a broken RIFF header', (t) => {
   const data = fs.readFileSync('./test/assets/bad_header_riff.wav');
   t.throws(() => {
     AudioWAV.fromFile(data);
-  }, { message: 'Invalid WAV header, expected \'RIFF\' and got \'RIFD\'' });
+  }, { message: 'Invalid WAV header, expected \'RIFF\', \'RF64\', or \'BW64\' and got \'RIFD\'' });
 });
 
 test('AudioWAV.decodeHeader(): can detect a broken WAVE header', (t) => {

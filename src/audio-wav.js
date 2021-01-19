@@ -1,7 +1,9 @@
-/* eslint-disable no-bitwise */
-let debug = () => {}; try { debug = require('debug')('Uttori.Utility.AudioWAV'); } catch {}
+/* eslint-disable import/no-unresolved, node/no-missing-require */
+let debug = () => {}; /* istanbul ignore next */ if (process.env.UTTORI_AUDIOWAV_DEBUG) { try { debug = require('debug')('AudioWAV'); } catch {} }
 const zlib = require('zlib');
-const { DataBuffer, DataBufferList, DataStream } = require('@uttori/data-tools');
+const DataBuffer = require('@uttori/data-tools/data-buffer');
+const DataBufferList = require('@uttori/data-tools/data-buffer-list');
+const DataStream = require('@uttori/data-tools/data-stream');
 
 /**
  * AudioWAV - WAVE Audio Utility
@@ -51,11 +53,11 @@ class AudioWAV extends DataStream {
    * @static
    */
   static fromFile(data, options) {
-    debug('fromFile:', data.length);
+    debug('fromFile:', data.length, data.byteLength);
     const buffer = new DataBuffer(data);
     const list = new DataBufferList();
     list.append(buffer);
-    return new AudioWAV(list, { size: data.length }, options);
+    return new AudioWAV(list, { size: buffer.length }, options);
   }
 
   /**
@@ -95,15 +97,16 @@ class AudioWAV extends DataStream {
 
   /**
    * Decodes and validates WAV Header.
+   * Checks for `RIFF` / `RF64` / `BW64` header, reads the size, and then checks for the `WAVE header.
    *
    * Signature (Decimal): [82, 73, 70, 70, ..., ..., ..., ..., 87, 65, 86, 69]
    * Signature (Hexadecimal): [52, 49, 46, 46, ..., ..., ..., ..., 57, 41, 56, 45]
    * Signature (ASCII): [R, I, F, F, ..., ..., ..., ..., W, A, V, E]
    *
-   * @param {string | Buffer} chunk - Data Blob
-   * @returns {object} - The decoded values.
    * @static
-   * @throws {Error} Invalid WAV header, expected 'WAVE'
+   * @param {string|Buffer} chunk - Data Blob
+   * @returns {object} - The decoded values.
+   * @throws {Error} Invalid WAV header
    */
   static decodeHeader(chunk) {
     debug('decodeHeader');
@@ -112,7 +115,7 @@ class AudioWAV extends DataStream {
     // Contains the letters `RIFF`, `RF64`, or `BW64` in ASCII form.
     const chunkID = header.readString(4);
     if (!['RIFF', 'RF64', 'BW64'].includes(chunkID)) {
-      throw new Error(`Invalid WAV header, expected 'RIFF' and got '${chunkID}'`);
+      throw new Error(`Invalid WAV header, expected 'RIFF', 'RF64', or 'BW64' and got '${chunkID}'`);
     }
 
     // This is the size of the rest of the chunk following this number.
@@ -120,19 +123,17 @@ class AudioWAV extends DataStream {
     // RF64 sets this to -1 = 0xFFFFFFFF as it doesn't use this to support larger sizes in the DS64 chunk.
     const size = header.readUInt32(true);
 
-    // Contains the letters `WAVE` in ASCII form
+    // Contains the letters `WAVE` in ASCII form.
     const format = header.readString(4);
     if (format !== 'WAVE') {
       throw new Error(`Invalid WAV header, expected 'WAVE' and got '${format}'`);
     }
 
-    const value = {
+    return {
       chunkID,
       size,
       format,
     };
-
-    return value;
   }
 
   /**
@@ -141,8 +142,8 @@ class AudioWAV extends DataStream {
    * @param {object} data - The values to encode to the header chunk chunk.
    * @param {string} [data.riff='RIFF'] - RIFF Header, should contains the string `RIFF`, `RF64`, or `BW64` in ASCII form.
    * @param {number} data.size - This is the size of the entire file in bytes minus 8 bytes for the 2 fields not included in this count. RF64 sets this to -1 = 0xFFFFFFFF as it doesn't use this to support larger sizes in the DS64 chunk.
-   * @param {string} [data.format='WAVE'] - Contains the string `WAVE` in ASCII form
-   * @returns {Buffer} - The newley encoded `fmt ` chunk.
+   * @param {string} [data.format='WAVE'] - WAVE Header, the string `WAVE` in ASCII form.
+   * @returns {Buffer} - The newley encoded header chunk.
    * @static
    */
   static encodeHeader(data) {
@@ -163,20 +164,19 @@ class AudioWAV extends DataStream {
 
   /**
    * Decodes the chunk type, and attempts to parse that chunk if supported.
-   * Supported Chunk Types: IHDR, PLTE, IDAT, IEND, tRNS, pHYs
+   * Supported Chunk Types: `fmt `, `fact`, `inst`, `DISP`, `smpl`, `tlst`, `data`, `LIST`, `RLND`, `JUNK`, `acid`, `cue `, `bext`, `ResU`, `ds64`, `cart`
    *
    * Chunk Structure:
-   * Length: 4 bytes
-   * Type:   4 bytes (IHDR, PLTE, IDAT, IEND, etc.)
+   * Length: 4 bytes (integer)
+   * Type:   4 bytes (string)
    * Chunk:  {length} bytes
-   * CRC:    4 bytes
    *
    * @returns {string} Chunk Type
    * @throws {Error} Invalid Chunk Length when less than 0
    * @see {@link http://www.w3.org/TR/2003/REC-PNG-20031110/#5Chunk-layout|Chunk Layout}
    */
   decodeChunk() {
-    debug('decodeChunk at offset', this.offset, 'of', this.size, 'bytes and', this.remainingBytes(), 'remaining bytes');
+    debug('decodeChunk at offset', this.offset, 'with', this.remainingBytes(), 'remaining bytes');
     const type = this.readString(4);
     debug('decodeChunk type', type);
     let size = this.readUInt32(true);
@@ -196,8 +196,6 @@ class AudioWAV extends DataStream {
       debug('decodeChunk size', size, 'too large, using remaining bytes', this.remainingBytes());
       size = this.remainingBytes();
     }
-
-    // TODO: Check for known misread headers to fix off by 1 errors.
 
     switch (type) {
       case 'fmt ': {
@@ -355,9 +353,6 @@ class AudioWAV extends DataStream {
     let audioFormat = '';
     /* istanbul ignore next */
     switch (audioFormatValue) {
-      case 0x0000:
-        audioFormat = 'Unknown: 0';
-        break;
       case 0x0001:
         audioFormat = 'Microsoft Pulse Code Modulation (PCM) / Uncompressed';
         break;
@@ -1074,9 +1069,6 @@ class AudioWAV extends DataStream {
         break;
       case 0xDFAC:
         audioFormat = 'DebugMode SonicFoundry Vegas FrameServer ACM Codec';
-        break;
-      case 0xE708:
-        audioFormat = 'Unknown -';
         break;
       case 0xF1AC:
         audioFormat = 'Free Lossless Audio Codec FLAC';
