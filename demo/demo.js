@@ -28,7 +28,23 @@ const makeDetail = (key, value, keyClass = '', valueClass = '') => {
 };
 
 
-const known = ['header', 'format', 'list', 'data', 'roland', 'display', 'broadcast_extension', 'logic_resu', 'cue_points', 'sample', 'instrument', 'trigger_list', 'data_size_64', 'acid'];
+const known = [
+  'header',
+  'format',
+  'list',
+  'data',
+  'roland',
+  'display',
+  'broadcast_extension',
+  'logic_resu',
+  'cue_points',
+  'sample',
+  'instrument',
+  'trigger_list',
+  'data_size_64',
+  'acid',
+  'padding',
+];
 const labelType = 'Chunk Type:';
 const labelSize = 'Chunk Size';
 

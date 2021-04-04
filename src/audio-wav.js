@@ -177,7 +177,7 @@ class AudioWAV extends DataStream {
    */
   decodeChunk() {
     debug('decodeChunk at offset', this.offset, 'with', this.remainingBytes(), 'remaining bytes');
-    const type = this.readString(4);
+    let type = this.readString(4);
     debug('decodeChunk type', type);
     let size = this.readUInt32(true);
     debug('decodeChunk size', size);
@@ -194,6 +194,13 @@ class AudioWAV extends DataStream {
     /* istanbul ignore next */
     if (size > this.remainingBytes()) {
       debug('decodeChunk size', size, 'too large, using remaining bytes', this.remainingBytes());
+      size = this.remainingBytes();
+    }
+
+    // Check for really broken cases to avoid infinte loops.
+    if (!type || size === 0) {
+      debug('decodeChunk something is wrong, ending');
+      type = '(broken)';
       size = this.remainingBytes();
     }
 
@@ -272,11 +279,32 @@ class AudioWAV extends DataStream {
         this.chunks.push({ type: 'junk', chunk });
         break;
       }
+      case 'PAD ': {
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        AudioWAV.decodePAD(chunk, this.options);
+        this.chunks.push({ type: 'padding', chunk });
+        break;
+      }
+      case 'PEAK': {
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        const value = AudioWAV.decodePEAK(chunk, this.options);
+        this.chunks.push({ type: 'peak', value, chunk });
+        break;
+      }
       case 'acid': {
         this.rewind(8);
         const chunk = this.read(8 + size, true);
         const value = AudioWAV.decodeACID(chunk);
         this.chunks.push({ type: 'acid', value, chunk });
+        break;
+      }
+      case 'strc': {
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        const value = AudioWAV.decodeSTRC(chunk);
+        this.chunks.push({ type: 'strc', value, chunk });
         break;
       }
       case 'cue ': {
@@ -311,6 +339,26 @@ class AudioWAV extends DataStream {
         this.rewind(8);
         const chunk = this.read(8 + size, true);
         this.chunks.push({ type: 'cart', chunk, unknown: true });
+        break;
+      }
+      case 'AFAn':
+      case 'AFmd': {
+        // Seems to be the result of a NSKeyedArchiver.
+        debug(`macOS Special Binary Chunk: '${type}' with ${size} bytes`);
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        this.chunks.push({ type, chunk, description: 'macOS Special Binary Chunk' });
+        break;
+      }
+      case 'minf':
+      case 'elm1':
+      case 'regn':
+      case 'ovwf':
+      case 'umid': {
+        debug(`ProTools Special Chunk: '${type}' with ${size} bytes`);
+        this.rewind(8);
+        const chunk = this.read(8 + size, true);
+        this.chunks.push({ type, chunk, description: 'ProTools Special Chunk' });
         break;
       }
       default: {
@@ -1483,17 +1531,14 @@ class AudioWAV extends DataStream {
    * Fact chunks exist in all wave files that are compressed or that have a wave list chunk.
    * A fact chunk is not required in an uncompressed PCM file that does not have a wave list chunk.
    *
-   * According to the fact chunk's initial specification,
-   * the data portion of the fact chunk will contain only
-   * one 4-byte number that specifies the number of samples
-   * in the data chunk of the Wave file. This number,
-   * when combined with the samples per second value in
-   * the format chunk of the Wave file, can be used to
-   * compute the length of the audio data in seconds.
+   * According to the fact chunk's initial specification, the data portion of the fact chunk will contain only one 4-byte number that specifies the number of samples in the data chunk of the Wave file.
+   * This number, when combined with the samples per second value in the format chunk of the Wave file, can be used to compute the length of the audio data in seconds.
    *
    * @param {string | Buffer} chunk  Data Blob
    * @returns {object} The decoded values.
    * @static
+   * @see {@link https://www.recordingblogs.com/wiki/fact-chunk-of-a-wave-file|Fact chunk (of a Wave file)}
+   * @see {@link http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html|Audio File Format Specifications}
    */
   static decodeFACT(chunk) {
     debug('decodeFACT');
@@ -1503,9 +1548,49 @@ class AudioWAV extends DataStream {
     debug('decodeFACT size', size);
 
     // Various information about the contents of the file, depending on the compression code.
-    const data = fact.readUInt8();
-    const value = { data };
+    // For Non-PCM, Number of samples (per channel)
+    const numberOfSamples = fact.readUInt32(true);
+    const value = { numberOfSamples };
     debug('decodeFACT =', JSON.stringify(value, null, 2));
+    return value;
+  }
+
+  // TODO: Should have more entries by number of channels, https://github.com/libsndfile/libsndfile/blob/08d802a3d18fa19c74f38ed910d9e33f80248187/src/aiff.c#L110
+  /**
+   * Decode the PEAK chunk.
+   *
+   * @param {string|Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
+   * @static
+   * @see {@link https://code.google.com/archive/p/awesome-wav/wikis/WAVFormat.wiki|awesome-wav - WAVFormat.wiki}
+   */
+  static decodePEAK(chunk) {
+    debug('decodePEAK');
+    const peak = DataStream.fromData(chunk);
+    const _chunkID = peak.readString(4);
+    const size = peak.readUInt32(true);
+    debug('decodePEAK size', size);
+
+    // Peak Chunk Version
+    const version = peak.readUInt32(true);
+
+    // Unix timestamp of creation
+    const timestamp = peak.readUInt32(true);
+
+    // Pointer to the PPEAK structs (one for each channel), Sample frame for peak
+    const ppeakPointer = peak.readUInt32(true);
+
+    // Space for the 64-bit alignment variable
+    const bitAlign = peak.readUInt32(true);
+
+    const value = {
+      version,
+      timestamp,
+      ppeakPointer,
+      bitAlign,
+    };
+
+    debug('decodePEAK =', JSON.stringify(value, null, 2));
     return value;
   }
 
@@ -2185,6 +2270,19 @@ class AudioWAV extends DataStream {
   }
 
   /**
+   * Decode the `PAD ` (Padding) chunk.
+   *
+   * @param {string|Buffer} chunk  Data Blob
+   * @static
+   */
+  static decodePAD(chunk) {
+    const pad = DataStream.fromData(chunk);
+    const chunkID = pad.readString(4);
+    const size = pad.readUInt32(true);
+    debug(`decodePAD: ${chunk.length} bytes, chunkID: ${chunkID}, pad size: ${size}`);
+  }
+
+  /**
    * Decode the bext (Broadcast Wave Format (BWF) Broadcast Extension) chunk.
    *
    * @param {string | Buffer} chunk Data Blob
@@ -2415,6 +2513,82 @@ class AudioWAV extends DataStream {
     };
 
     debug('decodeDS64 =', JSON.stringify(value, null, 2));
+    return value;
+  }
+
+  /**
+   * Decode the STRC (ACID Related) chunk.
+   *
+   * When a wave file is used as wave samples in a MIDI synthesizer,
+   * the instrument chunk helps the MIDI synthesizer define the sample pitch & relative volume of the samples.
+   *
+   * @param {string | Buffer} chunk  Data Blob
+   * @returns {object} The decoded values.
+   * @static
+   */
+  static decodeSTRC(chunk) {
+    debug('decodeSTRC');
+    const strc = DataStream.fromData(chunk);
+    const _chunkID = strc.readString(4);
+    const size = strc.readUInt32(true);
+    debug('decodeSTRC size:', size);
+
+    const unknown1 = strc.readUInt32(true); // always 28 (0x1C)
+    const numberOfSlices = strc.readUInt32(true); // i.e. number of 32 byte blocks following this header
+    const unknown2 = strc.readUInt32(true); // either 0, 25 (0x19) or 65 (0x41)
+    const unknown3 = strc.readUInt32(true); // either 10 (0x0A) or 5 (0x05) seems to be linked to value of unknown 2, i.e. 25 and 10 go together, or 65 and 5
+    const unknown4 = strc.readUInt32(true); // always 1 (0x01)
+    const unknown5 = strc.readUInt32(true); // either 0, 1 or 10
+    const unknown6 = strc.readUInt32(true); // have seen values 0,2,3,4 and 5
+
+    const slices = [];
+    debug('decodeSTRC numberOfSlices:', numberOfSlices);
+    for (let i = 0; i < numberOfSlices - 1; i++) {
+      const header = strc.readUInt32(true); // either 0 or 2
+      const ID1 = strc.readUInt32(true); // Random?
+
+      // sample position of this slice
+      const samplePositionUpper = strc.readUInt32(true);
+      const samplePositionLower = strc.readUInt32(true);
+
+      // first set of slices this will be zero, second set it will be the same as samplePosition
+      const samplePosition2Upper = strc.readUInt32(true);
+      const samplePosition2Lower = strc.readUInt32(true);
+
+      // first set of slices this is a large number, different every time, but in similar order of magnitude, doesn't seem to be a float.
+      // could be some kind of volume representation? Second set of slices it will be zero
+      const data3 = strc.readUInt32(true);
+
+      // another seemingly random number, but the same value for every slice
+      const ID2 = strc.readUInt32(true);
+
+      const slice = {
+        header,
+        ID1,
+        samplePositionUpper,
+        samplePositionLower,
+        samplePosition2Upper,
+        samplePosition2Lower,
+        data3,
+        ID2,
+      };
+      debug('decodeSTRC slice:', i, slice);
+      debug('remaining', strc.remainingBytes());
+      slices.push(slice);
+    }
+    debug('decodeSTRC remaining', strc.remainingBytes());
+
+    const value = {
+      unknown1,
+      numberOfSlices,
+      unknown2,
+      unknown3,
+      unknown4,
+      unknown5,
+      unknown6,
+      slices,
+    };
+    debug('decodeSTRC =', JSON.stringify(value, null, 2));
     return value;
   }
 }

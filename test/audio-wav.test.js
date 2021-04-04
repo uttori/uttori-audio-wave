@@ -304,7 +304,7 @@ test('AudioWAV.decodeChunk(): can recover from a bad chunk (Bell.wav)', (t) => {
 test('AudioWAV.decodeChunk(): can recover from a bad chunk (Scream_FX_1.wav)', (t) => {
   const data = fs.readFileSync('./test/assets/Scream_FX_1.wav');
   const audio = AudioWAV.fromFile(data);
-  t.is(audio.chunks.length, 11);
+  t.is(audio.chunks.length, 10);
   t.is(audio.chunks[0].type, 'header');
   t.is(audio.chunks[1].type, 'format');
   t.is(audio.chunks[2].type, 'data');
@@ -314,4 +314,154 @@ test('AudioWAV.decodeChunk(): can recover from a bad chunk (Scream_FX_1.wav)', (
   t.is(audio.chunks[6].type, 'list');
   t.is(audio.chunks[7].type, 'list');
   t.is(audio.chunks[8].type, 'muma');
+});
+
+// Infinite Loop on broken tags
+test('AudioWAV.decodeChunk(): can recover from a bad chunk (Waka SNARE ROLL PATTERN (45).wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/Waka SNARE ROLL PATTERN (45).wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 8);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'data');
+  t.is(audio.chunks[3].type, 'list');
+  t.is(audio.chunks[4].type, 'display');
+  t.is(audio.chunks[5].type, 'broadcast_extension');
+  // t.is(audio.chunks[6].type, 'art');
+  t.is(audio.chunks[7].type, '(broken)');
+});
+
+// TODO: AVID Pro Tools automatically embedds the following chunks: media information ('minf'), elm1, regn, umid and DGDA. `ovwf`
+// https://www.arsc-audio.org/pdf/ARSC_TC_MD_Study.pdf
+test('AudioWAV.decodeChunk(): can decode ProTools chunks (without ovwf) (RONNY 808 04.wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/RONNY 808 04.wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 9);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'broadcast_extension');
+  t.is(audio.chunks[2].type, 'format');
+  t.is(audio.chunks[3].type, 'minf');
+  t.is(audio.chunks[4].type, 'elm1');
+  t.is(audio.chunks[5].type, 'data');
+  t.is(audio.chunks[6].type, 'regn');
+  t.is(audio.chunks[7].type, 'umid');
+  t.is(audio.chunks[8].type, 'DGDA');
+});
+
+test('AudioWAV.decodeChunk(): can decode ProTools chunks (with ovwf) (Waka Clap 3 (9).wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/Waka Clap 3 (9).wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 9);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'broadcast_extension');
+  t.is(audio.chunks[2].type, 'format');
+  t.is(audio.chunks[3].type, 'minf');
+  t.is(audio.chunks[4].type, 'elm1');
+  t.is(audio.chunks[5].type, 'data');
+  t.is(audio.chunks[6].type, 'regn');
+  t.is(audio.chunks[7].type, 'ovwf');
+  t.is(audio.chunks[8].type, 'umid');
+});
+
+test('AudioWAV.decodeChunk(): can decode `PAD ` chunks (Supa Chant.wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/Supa Chant.wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 5);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'padding');
+  t.is(audio.chunks[3].type, 'data');
+  t.is(audio.chunks[4].type, 'padding');
+});
+
+// TODO: LGWV LoGicWaV, `ID3 `, Logic Pro, Native Instruments
+test('AudioWAV.decodeChunk(): can decode LGWV & `ID3 ` chunks (MB Hi Hat (2).wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/MB Hi Hat (2).wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 6);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'padding');
+  t.is(audio.chunks[3].type, 'data');
+  t.is(audio.chunks[4].type, 'LGWV');
+  t.is(audio.chunks[5].type, 'ID3 ');
+});
+
+// TODO: `id3 `
+test('AudioWAV.decodeChunk(): can decode fact & `id3 ` chunks (Hard Hard_Vox.wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/Hard Hard_Vox.wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 12);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'fact');
+  t.is(audio.chunks[3].type, 'data');
+  t.is(audio.chunks[4].type, 'sample');
+  t.is(audio.chunks[5].type, 'instrument');
+  t.is(audio.chunks[6].type, 'acid');
+  t.is(audio.chunks[7].type, 'strc');
+  t.is(audio.chunks[8].type, 'cue_points');
+  t.is(audio.chunks[9].type, 'list');
+  t.is(audio.chunks[10].type, 'list');
+  t.is(audio.chunks[11].type, 'id3 ');
+});
+
+// TODO: PEAK file with more than one entry
+test('AudioWAV.decodeChunk(): can decode PEAK chunks (63138__uzerx__SUB_A_2_secs.wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/63138__uzerx__SUB_A_2_secs.wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 5);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'fact');
+  t.is(audio.chunks[3].type, 'peak');
+  t.is(audio.chunks[4].type, 'data');
+});
+
+// Broken Tags
+test('AudioWAV.decodeChunk(): can decode PEAK chunks (Gated Rizer.wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/Gated Rizer.wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 8);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'data');
+  t.is(audio.chunks[3].type, 'list');
+  t.is(audio.chunks[4].type, 'display');
+  t.is(audio.chunks[5].type, 'broadcast_extension');
+  // t.is(audio.chunks[6].type, 'art');
+  t.is(audio.chunks[7].type, '(broken)');
+});
+
+// https://www.finetunedmac.com/forums/ubbthreads.php?ubb=showflat&Number=8940s
+test('AudioWAV.decodeChunk(): can decode strc chunks with many slices (01 fx 01.wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/01 fx 01.wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 10);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'sample');
+  t.is(audio.chunks[3].type, 'instrument');
+  t.is(audio.chunks[4].type, 'list');
+  t.is(audio.chunks[5].type, 'data');
+  t.is(audio.chunks[6].type, 'AFAn');
+  t.is(audio.chunks[7].type, 'acid');
+  t.is(audio.chunks[8].type, 'strc');
+  t.is(audio.chunks[9].type, 'AFmd');
+});
+
+test('AudioWAV.decodeChunk(): can decode strc chunks with many slices (02 fx 02.wav)', (t) => {
+  const data = fs.readFileSync('./test/assets/02 fx 02.wav');
+  const audio = AudioWAV.fromFile(data);
+  t.is(audio.chunks.length, 10);
+  t.is(audio.chunks[0].type, 'header');
+  t.is(audio.chunks[1].type, 'format');
+  t.is(audio.chunks[2].type, 'sample');
+  t.is(audio.chunks[3].type, 'instrument');
+  t.is(audio.chunks[4].type, 'list');
+  t.is(audio.chunks[5].type, 'data');
+  t.is(audio.chunks[6].type, 'AFAn');
+  t.is(audio.chunks[7].type, 'acid');
+  t.is(audio.chunks[8].type, 'strc');
+  t.is(audio.chunks[9].type, 'AFmd');
 });

@@ -40,8 +40,8 @@ const crc32 = (crc, buf, len, pos) => {
 };
 var crc32_1 = crc32;
 
-const BAD = 30;
-const TYPE = 12;
+const BAD$1 = 30;
+const TYPE$1 = 12;
 var inffast = function inflate_fast(strm, start) {
   let _in;
   let last;
@@ -145,7 +145,7 @@ var inffast = function inflate_fast(strm, start) {
             dist += hold & (1 << op) - 1;
             if (dist > dmax) {
               strm.msg = 'invalid distance too far back';
-              state.mode = BAD;
+              state.mode = BAD$1;
               break top;
             }
             hold >>>= op;
@@ -156,7 +156,7 @@ var inffast = function inflate_fast(strm, start) {
               if (op > whave) {
                 if (state.sane) {
                   strm.msg = 'invalid distance too far back';
-                  state.mode = BAD;
+                  state.mode = BAD$1;
                   break top;
                 }
               }
@@ -235,7 +235,7 @@ var inffast = function inflate_fast(strm, start) {
             continue dodist;
           } else {
             strm.msg = 'invalid distance code';
-            state.mode = BAD;
+            state.mode = BAD$1;
             break top;
           }
           break;
@@ -245,11 +245,11 @@ var inffast = function inflate_fast(strm, start) {
         hold & (1 << op) - 1)];
         continue dolen;
       } else if (op & 32) {
-        state.mode = TYPE;
+        state.mode = TYPE$1;
         break top;
       } else {
         strm.msg = 'invalid literal/length code';
-        state.mode = BAD;
+        state.mode = BAD$1;
         break top;
       }
       break;
@@ -269,11 +269,11 @@ var inffast = function inflate_fast(strm, start) {
 };
 
 const MAXBITS = 15;
-const ENOUGH_LENS = 852;
-const ENOUGH_DISTS = 592;
-const CODES = 0;
-const LENS = 1;
-const DISTS = 2;
+const ENOUGH_LENS$1 = 852;
+const ENOUGH_DISTS$1 = 592;
+const CODES$1 = 0;
+const LENS$1 = 1;
+const DISTS$1 = 2;
 const lbase = new Uint16Array([
 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227, 258, 0, 0]);
 const lext = new Uint8Array([
@@ -344,7 +344,7 @@ const inflate_table = (type, lens, lens_index, codes, table, table_index, work, 
       return -1;
     }
   }
-  if (left > 0 && (type === CODES || max !== 1)) {
+  if (left > 0 && (type === CODES$1 || max !== 1)) {
     return -1;
   }
   offs[1] = 0;
@@ -356,10 +356,10 @@ const inflate_table = (type, lens, lens_index, codes, table, table_index, work, 
       work[offs[lens[lens_index + sym]]++] = sym;
     }
   }
-  if (type === CODES) {
+  if (type === CODES$1) {
     base = extra = work;
     end = 19;
-  } else if (type === LENS) {
+  } else if (type === LENS$1) {
     base = lbase;
     base_index -= 257;
     extra = lext;
@@ -379,7 +379,7 @@ const inflate_table = (type, lens, lens_index, codes, table, table_index, work, 
   low = -1;
   used = 1 << root;
   mask = used - 1;
-  if (type === LENS && used > ENOUGH_LENS || type === DISTS && used > ENOUGH_DISTS) {
+  if (type === LENS$1 && used > ENOUGH_LENS$1 || type === DISTS$1 && used > ENOUGH_DISTS$1) {
     return 1;
   }
   for (;;) {
@@ -434,7 +434,7 @@ const inflate_table = (type, lens, lens_index, codes, table, table_index, work, 
         left <<= 1;
       }
       used += 1 << curr;
-      if (type === LENS && used > ENOUGH_LENS || type === DISTS && used > ENOUGH_DISTS) {
+      if (type === LENS$1 && used > ENOUGH_LENS$1 || type === DISTS$1 && used > ENOUGH_DISTS$1) {
         return 1;
       }
       low = huff & mask;
@@ -449,7 +449,7 @@ const inflate_table = (type, lens, lens_index, codes, table, table_index, work, 
 };
 var inftrees = inflate_table;
 
-var constants = {
+var constants$1 = {
   Z_NO_FLUSH: 0,
   Z_PARTIAL_FLUSH: 1,
   Z_SYNC_FLUSH: 2,
@@ -480,22 +480,22 @@ var constants = {
   Z_DEFLATED: 8
 };
 
-const CODES$1 = 0;
-const LENS$1 = 1;
-const DISTS$1 = 2;
+const CODES = 0;
+const LENS = 1;
+const DISTS = 2;
 const {
-  Z_FINISH,
+  Z_FINISH: Z_FINISH$1,
   Z_BLOCK,
   Z_TREES,
-  Z_OK,
-  Z_STREAM_END,
-  Z_NEED_DICT,
-  Z_STREAM_ERROR,
-  Z_DATA_ERROR,
-  Z_MEM_ERROR,
+  Z_OK: Z_OK$1,
+  Z_STREAM_END: Z_STREAM_END$1,
+  Z_NEED_DICT: Z_NEED_DICT$1,
+  Z_STREAM_ERROR: Z_STREAM_ERROR$1,
+  Z_DATA_ERROR: Z_DATA_ERROR$1,
+  Z_MEM_ERROR: Z_MEM_ERROR$1,
   Z_BUF_ERROR,
   Z_DEFLATED
-} = constants;
+} = constants$1;
 const HEAD = 1;
 const FLAGS = 2;
 const TIME = 3;
@@ -507,7 +507,7 @@ const COMMENT = 8;
 const HCRC = 9;
 const DICTID = 10;
 const DICT = 11;
-const TYPE$1 = 12;
+const TYPE = 12;
 const TYPEDO = 13;
 const STORED = 14;
 const COPY_ = 15;
@@ -525,11 +525,11 @@ const LIT = 26;
 const CHECK = 27;
 const LENGTH = 28;
 const DONE = 29;
-const BAD$1 = 30;
+const BAD = 30;
 const MEM = 31;
 const SYNC = 32;
-const ENOUGH_LENS$1 = 852;
-const ENOUGH_DISTS$1 = 592;
+const ENOUGH_LENS = 852;
+const ENOUGH_DISTS = 592;
 const MAX_WBITS = 15;
 const DEF_WBITS = MAX_WBITS;
 const zswap32 = q => {
@@ -574,7 +574,7 @@ function InflateState() {
 }
 const inflateResetKeep = strm => {
   if (!strm || !strm.state) {
-    return Z_STREAM_ERROR;
+    return Z_STREAM_ERROR$1;
   }
   const state = strm.state;
   strm.total_in = strm.total_out = state.total = 0;
@@ -590,15 +590,15 @@ const inflateResetKeep = strm => {
   ;
   state.hold = 0;
   state.bits = 0;
-  state.lencode = state.lendyn = new Int32Array(ENOUGH_LENS$1);
-  state.distcode = state.distdyn = new Int32Array(ENOUGH_DISTS$1);
+  state.lencode = state.lendyn = new Int32Array(ENOUGH_LENS);
+  state.distcode = state.distdyn = new Int32Array(ENOUGH_DISTS);
   state.sane = 1;
   state.back = -1;
-  return Z_OK;
+  return Z_OK$1;
 };
 const inflateReset = strm => {
   if (!strm || !strm.state) {
-    return Z_STREAM_ERROR;
+    return Z_STREAM_ERROR$1;
   }
   const state = strm.state;
   state.wsize = 0;
@@ -609,7 +609,7 @@ const inflateReset = strm => {
 const inflateReset2 = (strm, windowBits) => {
   let wrap;
   if (!strm || !strm.state) {
-    return Z_STREAM_ERROR;
+    return Z_STREAM_ERROR$1;
   }
   const state = strm.state;
   if (windowBits < 0) {
@@ -622,7 +622,7 @@ const inflateReset2 = (strm, windowBits) => {
     }
   }
   if (windowBits && (windowBits < 8 || windowBits > 15)) {
-    return Z_STREAM_ERROR;
+    return Z_STREAM_ERROR$1;
   }
   if (state.window !== null && state.wbits !== windowBits) {
     state.window = null;
@@ -633,14 +633,14 @@ const inflateReset2 = (strm, windowBits) => {
 };
 const inflateInit2 = (strm, windowBits) => {
   if (!strm) {
-    return Z_STREAM_ERROR;
+    return Z_STREAM_ERROR$1;
   }
   const state = new InflateState();
   strm.state = state;
   state.window = null
   ;
   const ret = inflateReset2(strm, windowBits);
-  if (ret !== Z_OK) {
+  if (ret !== Z_OK$1) {
     strm.state = null
     ;
   }
@@ -668,14 +668,14 @@ const fixedtables = state => {
     while (sym < 288) {
       state.lens[sym++] = 8;
     }
-    inftrees(LENS$1, state.lens, 0, 288, lenfix, 0, state.work, {
+    inftrees(LENS, state.lens, 0, 288, lenfix, 0, state.work, {
       bits: 9
     });
     sym = 0;
     while (sym < 32) {
       state.lens[sym++] = 5;
     }
-    inftrees(DISTS$1, state.lens, 0, 32, distfix, 0, state.work, {
+    inftrees(DISTS, state.lens, 0, 32, distfix, 0, state.work, {
       bits: 5
     });
     virgin = false;
@@ -721,7 +721,7 @@ const updatewindow = (strm, src, end, copy) => {
   }
   return 0;
 };
-const inflate = (strm, flush) => {
+const inflate$1 = (strm, flush) => {
   let state;
   let input, output;
   let next;
@@ -744,10 +744,10 @@ const inflate = (strm, flush) => {
   const order =
   new Uint8Array([16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15]);
   if (!strm || !strm.state || !strm.output || !strm.input && strm.avail_in !== 0) {
-    return Z_STREAM_ERROR;
+    return Z_STREAM_ERROR$1;
   }
   state = strm.state;
-  if (state.mode === TYPE$1) {
+  if (state.mode === TYPE) {
     state.mode = TYPEDO;
   }
   put = strm.next_out;
@@ -760,7 +760,7 @@ const inflate = (strm, flush) => {
   bits = state.bits;
   _in = have;
   _out = left;
-  ret = Z_OK;
+  ret = Z_OK$1;
   inf_leave:
   for (;;) {
     switch (state.mode) {
@@ -796,13 +796,13 @@ const inflate = (strm, flush) => {
         (((hold & 0xff) <<
         8) + (hold >> 8)) % 31) {
           strm.msg = 'incorrect header check';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         if ((hold & 0x0f) !==
         Z_DEFLATED) {
           strm.msg = 'unknown compression method';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         hold >>>= 4;
@@ -813,13 +813,13 @@ const inflate = (strm, flush) => {
           state.wbits = len;
         } else if (len > state.wbits) {
           strm.msg = 'invalid window size';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         state.dmax = 1 << state.wbits;
         strm.adler = state.check = 1
         ;
-        state.mode = hold & 0x200 ? DICTID : TYPE$1;
+        state.mode = hold & 0x200 ? DICTID : TYPE;
         hold = 0;
         bits = 0;
         break;
@@ -835,12 +835,12 @@ const inflate = (strm, flush) => {
         state.flags = hold;
         if ((state.flags & 0xff) !== Z_DEFLATED) {
           strm.msg = 'unknown compression method';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         if (state.flags & 0xe000) {
           strm.msg = 'unknown header flags set';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         if (state.head) {
@@ -1015,7 +1015,7 @@ const inflate = (strm, flush) => {
           }
           if (hold !== (state.check & 0xffff)) {
             strm.msg = 'header crc mismatch';
-            state.mode = BAD$1;
+            state.mode = BAD;
             break;
           }
           hold = 0;
@@ -1026,7 +1026,7 @@ const inflate = (strm, flush) => {
           state.head.done = true;
         }
         strm.adler = state.check = 0;
-        state.mode = TYPE$1;
+        state.mode = TYPE;
         break;
       case DICTID:
         while (bits < 32) {
@@ -1049,12 +1049,12 @@ const inflate = (strm, flush) => {
           strm.avail_in = have;
           state.hold = hold;
           state.bits = bits;
-          return Z_NEED_DICT;
+          return Z_NEED_DICT$1;
         }
         strm.adler = state.check = 1
         ;
-        state.mode = TYPE$1;
-      case TYPE$1:
+        state.mode = TYPE;
+      case TYPE:
         if (flush === Z_BLOCK || flush === Z_TREES) {
           break inf_leave;
         }
@@ -1095,7 +1095,7 @@ const inflate = (strm, flush) => {
             break;
           case 3:
             strm.msg = 'invalid block type';
-            state.mode = BAD$1;
+            state.mode = BAD;
         }
         hold >>>= 2;
         bits -= 2;
@@ -1113,7 +1113,7 @@ const inflate = (strm, flush) => {
         }
         if ((hold & 0xffff) !== (hold >>> 16 ^ 0xffff)) {
           strm.msg = 'invalid stored block lengths';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         state.length = hold & 0xffff;
@@ -1145,7 +1145,7 @@ const inflate = (strm, flush) => {
           state.length -= copy;
           break;
         }
-        state.mode = TYPE$1;
+        state.mode = TYPE;
         break;
       case TABLE:
         while (bits < 14) {
@@ -1170,7 +1170,7 @@ const inflate = (strm, flush) => {
         bits -= 4;
         if (state.nlen > 286 || state.ndist > 30) {
           strm.msg = 'too many length or distance symbols';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         state.have = 0;
@@ -1197,11 +1197,11 @@ const inflate = (strm, flush) => {
         opts = {
           bits: state.lenbits
         };
-        ret = inftrees(CODES$1, state.lens, 0, 19, state.lencode, 0, state.work, opts);
+        ret = inftrees(CODES, state.lens, 0, 19, state.lencode, 0, state.work, opts);
         state.lenbits = opts.bits;
         if (ret) {
           strm.msg = 'invalid code lengths set';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         state.have = 0;
@@ -1242,7 +1242,7 @@ const inflate = (strm, flush) => {
               bits -= here_bits;
               if (state.have === 0) {
                 strm.msg = 'invalid bit length repeat';
-                state.mode = BAD$1;
+                state.mode = BAD;
                 break;
               }
               len = state.lens[state.have - 1];
@@ -1284,7 +1284,7 @@ const inflate = (strm, flush) => {
             }
             if (state.have + copy > state.nlen + state.ndist) {
               strm.msg = 'invalid bit length repeat';
-              state.mode = BAD$1;
+              state.mode = BAD;
               break;
             }
             while (copy--) {
@@ -1292,23 +1292,23 @@ const inflate = (strm, flush) => {
             }
           }
         }
-        if (state.mode === BAD$1) {
+        if (state.mode === BAD) {
           break;
         }
         if (state.lens[256] === 0) {
           strm.msg = 'invalid code -- missing end-of-block';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         state.lenbits = 9;
         opts = {
           bits: state.lenbits
         };
-        ret = inftrees(LENS$1, state.lens, 0, state.nlen, state.lencode, 0, state.work, opts);
+        ret = inftrees(LENS, state.lens, 0, state.nlen, state.lencode, 0, state.work, opts);
         state.lenbits = opts.bits;
         if (ret) {
           strm.msg = 'invalid literal/lengths set';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         state.distbits = 6;
@@ -1316,11 +1316,11 @@ const inflate = (strm, flush) => {
         opts = {
           bits: state.distbits
         };
-        ret = inftrees(DISTS$1, state.lens, state.nlen, state.ndist, state.distcode, 0, state.work, opts);
+        ret = inftrees(DISTS, state.lens, state.nlen, state.ndist, state.distcode, 0, state.work, opts);
         state.distbits = opts.bits;
         if (ret) {
           strm.msg = 'invalid distances set';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         state.mode = LEN_;
@@ -1346,7 +1346,7 @@ const inflate = (strm, flush) => {
           have = strm.avail_in;
           hold = state.hold;
           bits = state.bits;
-          if (state.mode === TYPE$1) {
+          if (state.mode === TYPE) {
             state.back = -1;
           }
           break;
@@ -1401,12 +1401,12 @@ const inflate = (strm, flush) => {
         }
         if (here_op & 32) {
           state.back = -1;
-          state.mode = TYPE$1;
+          state.mode = TYPE;
           break;
         }
         if (here_op & 64) {
           strm.msg = 'invalid literal/length code';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         state.extra = here_op & 15;
@@ -1475,7 +1475,7 @@ const inflate = (strm, flush) => {
         state.back += here_bits;
         if (here_op & 64) {
           strm.msg = 'invalid distance code';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         state.offset = here_val;
@@ -1500,7 +1500,7 @@ const inflate = (strm, flush) => {
         }
         if (state.offset > state.dmax) {
           strm.msg = 'invalid distance too far back';
-          state.mode = BAD$1;
+          state.mode = BAD;
           break;
         }
         state.mode = MATCH;
@@ -1514,7 +1514,7 @@ const inflate = (strm, flush) => {
           if (copy > state.whave) {
             if (state.sane) {
               strm.msg = 'invalid distance too far back';
-              state.mode = BAD$1;
+              state.mode = BAD;
               break;
             }
           }
@@ -1573,7 +1573,7 @@ const inflate = (strm, flush) => {
           _out = left;
           if ((state.flags ? hold : zswap32(hold)) !== state.check) {
             strm.msg = 'incorrect data check';
-            state.mode = BAD$1;
+            state.mode = BAD;
             break;
           }
           hold = 0;
@@ -1592,7 +1592,7 @@ const inflate = (strm, flush) => {
           }
           if (hold !== (state.total & 0xffffffff)) {
             strm.msg = 'incorrect length check';
-            state.mode = BAD$1;
+            state.mode = BAD;
             break;
           }
           hold = 0;
@@ -1600,16 +1600,16 @@ const inflate = (strm, flush) => {
         }
         state.mode = DONE;
       case DONE:
-        ret = Z_STREAM_END;
+        ret = Z_STREAM_END$1;
         break inf_leave;
-      case BAD$1:
-        ret = Z_DATA_ERROR;
+      case BAD:
+        ret = Z_DATA_ERROR$1;
         break inf_leave;
       case MEM:
-        return Z_MEM_ERROR;
+        return Z_MEM_ERROR$1;
       case SYNC:
       default:
-        return Z_STREAM_ERROR;
+        return Z_STREAM_ERROR$1;
     }
   }
   strm.next_out = put;
@@ -1618,7 +1618,7 @@ const inflate = (strm, flush) => {
   strm.avail_in = have;
   state.hold = hold;
   state.bits = bits;
-  if (state.wsize || _out !== strm.avail_out && state.mode < BAD$1 && (state.mode < CHECK || flush !== Z_FINISH)) {
+  if (state.wsize || _out !== strm.avail_out && state.mode < BAD && (state.mode < CHECK || flush !== Z_FINISH$1)) {
     if (updatewindow(strm, strm.output, strm.next_out, _out - strm.avail_out)) ;
   }
   _in -= strm.avail_in;
@@ -1630,8 +1630,8 @@ const inflate = (strm, flush) => {
     strm.adler = state.check =
     state.flags ? crc32_1(state.check, output, _out, strm.next_out - _out) : adler32_1(state.check, output, _out, strm.next_out - _out);
   }
-  strm.data_type = state.bits + (state.last ? 64 : 0) + (state.mode === TYPE$1 ? 128 : 0) + (state.mode === LEN_ || state.mode === COPY_ ? 256 : 0);
-  if ((_in === 0 && _out === 0 || flush === Z_FINISH) && ret === Z_OK) {
+  strm.data_type = state.bits + (state.last ? 64 : 0) + (state.mode === TYPE ? 128 : 0) + (state.mode === LEN_ || state.mode === COPY_ ? 256 : 0);
+  if ((_in === 0 && _out === 0 || flush === Z_FINISH$1) && ret === Z_OK$1) {
     ret = Z_BUF_ERROR;
   }
   return ret;
@@ -1639,26 +1639,26 @@ const inflate = (strm, flush) => {
 const inflateEnd = strm => {
   if (!strm || !strm.state
   ) {
-      return Z_STREAM_ERROR;
+      return Z_STREAM_ERROR$1;
     }
   let state = strm.state;
   if (state.window) {
     state.window = null;
   }
   strm.state = null;
-  return Z_OK;
+  return Z_OK$1;
 };
 const inflateGetHeader = (strm, head) => {
   if (!strm || !strm.state) {
-    return Z_STREAM_ERROR;
+    return Z_STREAM_ERROR$1;
   }
   const state = strm.state;
   if ((state.wrap & 2) === 0) {
-    return Z_STREAM_ERROR;
+    return Z_STREAM_ERROR$1;
   }
   state.head = head;
   head.done = false;
-  return Z_OK;
+  return Z_OK$1;
 };
 const inflateSetDictionary = (strm, dictionary) => {
   const dictLength = dictionary.length;
@@ -1668,44 +1668,44 @@ const inflateSetDictionary = (strm, dictionary) => {
   if (!strm
   || !strm.state
   ) {
-      return Z_STREAM_ERROR;
+      return Z_STREAM_ERROR$1;
     }
   state = strm.state;
   if (state.wrap !== 0 && state.mode !== DICT) {
-    return Z_STREAM_ERROR;
+    return Z_STREAM_ERROR$1;
   }
   if (state.mode === DICT) {
     dictid = 1;
     dictid = adler32_1(dictid, dictionary, dictLength, 0);
     if (dictid !== state.check) {
-      return Z_DATA_ERROR;
+      return Z_DATA_ERROR$1;
     }
   }
   ret = updatewindow(strm, dictionary, dictLength, dictLength);
   if (ret) {
     state.mode = MEM;
-    return Z_MEM_ERROR;
+    return Z_MEM_ERROR$1;
   }
   state.havedict = 1;
-  return Z_OK;
+  return Z_OK$1;
 };
 var inflateReset_1 = inflateReset;
 var inflateReset2_1 = inflateReset2;
 var inflateResetKeep_1 = inflateResetKeep;
 var inflateInit_1 = inflateInit;
 var inflateInit2_1 = inflateInit2;
-var inflate_2 = inflate;
+var inflate_2$1 = inflate$1;
 var inflateEnd_1 = inflateEnd;
 var inflateGetHeader_1 = inflateGetHeader;
 var inflateSetDictionary_1 = inflateSetDictionary;
 var inflateInfo = 'pako inflate (from Nodeca project)';
-var inflate_1 = {
+var inflate_1$1 = {
   inflateReset: inflateReset_1,
   inflateReset2: inflateReset2_1,
   inflateResetKeep: inflateResetKeep_1,
   inflateInit: inflateInit_1,
   inflateInit2: inflateInit2_1,
-  inflate: inflate_2,
+  inflate: inflate_2$1,
   inflateEnd: inflateEnd_1,
   inflateGetHeader: inflateGetHeader_1,
   inflateSetDictionary: inflateSetDictionary_1,
@@ -1927,14 +1927,14 @@ var gzheader = GZheader;
 const toString = Object.prototype.toString;
 const {
   Z_NO_FLUSH,
-  Z_FINISH: Z_FINISH$1,
-  Z_OK: Z_OK$1,
-  Z_STREAM_END: Z_STREAM_END$1,
-  Z_NEED_DICT: Z_NEED_DICT$1,
-  Z_STREAM_ERROR: Z_STREAM_ERROR$1,
-  Z_DATA_ERROR: Z_DATA_ERROR$1,
-  Z_MEM_ERROR: Z_MEM_ERROR$1
-} = constants;
+  Z_FINISH,
+  Z_OK,
+  Z_STREAM_END,
+  Z_NEED_DICT,
+  Z_STREAM_ERROR,
+  Z_DATA_ERROR,
+  Z_MEM_ERROR
+} = constants$1;
 function Inflate(options) {
   this.options = common.assign({
     chunkSize: 1024 * 64,
@@ -1962,12 +1962,12 @@ function Inflate(options) {
   this.chunks = [];
   this.strm = new zstream();
   this.strm.avail_out = 0;
-  let status = inflate_1.inflateInit2(this.strm, opt.windowBits);
-  if (status !== Z_OK$1) {
+  let status = inflate_1$1.inflateInit2(this.strm, opt.windowBits);
+  if (status !== Z_OK) {
     throw new Error(messages[status]);
   }
   this.header = new gzheader();
-  inflate_1.inflateGetHeader(this.strm, this.header);
+  inflate_1$1.inflateGetHeader(this.strm, this.header);
   if (opt.dictionary) {
     if (typeof opt.dictionary === 'string') {
       opt.dictionary = strings.string2buf(opt.dictionary);
@@ -1975,8 +1975,8 @@ function Inflate(options) {
       opt.dictionary = new Uint8Array(opt.dictionary);
     }
     if (opt.raw) {
-      status = inflate_1.inflateSetDictionary(this.strm, opt.dictionary);
-      if (status !== Z_OK$1) {
+      status = inflate_1$1.inflateSetDictionary(this.strm, opt.dictionary);
+      if (status !== Z_OK) {
         throw new Error(messages[status]);
       }
     }
@@ -1988,7 +1988,7 @@ Inflate.prototype.push = function (data, flush_mode) {
   const dictionary = this.options.dictionary;
   let status, _flush_mode, last_avail_out;
   if (this.ended) return false;
-  if (flush_mode === ~~flush_mode) _flush_mode = flush_mode;else _flush_mode = flush_mode === true ? Z_FINISH$1 : Z_NO_FLUSH;
+  if (flush_mode === ~~flush_mode) _flush_mode = flush_mode;else _flush_mode = flush_mode === true ? Z_FINISH : Z_NO_FLUSH;
   if (toString.call(data) === '[object ArrayBuffer]') {
     strm.input = new Uint8Array(data);
   } else {
@@ -2002,31 +2002,31 @@ Inflate.prototype.push = function (data, flush_mode) {
       strm.next_out = 0;
       strm.avail_out = chunkSize;
     }
-    status = inflate_1.inflate(strm, _flush_mode);
-    if (status === Z_NEED_DICT$1 && dictionary) {
-      status = inflate_1.inflateSetDictionary(strm, dictionary);
-      if (status === Z_OK$1) {
-        status = inflate_1.inflate(strm, _flush_mode);
-      } else if (status === Z_DATA_ERROR$1) {
-        status = Z_NEED_DICT$1;
+    status = inflate_1$1.inflate(strm, _flush_mode);
+    if (status === Z_NEED_DICT && dictionary) {
+      status = inflate_1$1.inflateSetDictionary(strm, dictionary);
+      if (status === Z_OK) {
+        status = inflate_1$1.inflate(strm, _flush_mode);
+      } else if (status === Z_DATA_ERROR) {
+        status = Z_NEED_DICT;
       }
     }
-    while (strm.avail_in > 0 && status === Z_STREAM_END$1 && strm.state.wrap > 0 && data[strm.next_in] !== 0) {
-      inflate_1.inflateReset(strm);
-      status = inflate_1.inflate(strm, _flush_mode);
+    while (strm.avail_in > 0 && status === Z_STREAM_END && strm.state.wrap > 0 && data[strm.next_in] !== 0) {
+      inflate_1$1.inflateReset(strm);
+      status = inflate_1$1.inflate(strm, _flush_mode);
     }
     switch (status) {
-      case Z_STREAM_ERROR$1:
-      case Z_DATA_ERROR$1:
-      case Z_NEED_DICT$1:
-      case Z_MEM_ERROR$1:
+      case Z_STREAM_ERROR:
+      case Z_DATA_ERROR:
+      case Z_NEED_DICT:
+      case Z_MEM_ERROR:
         this.onEnd(status);
         this.ended = true;
         return false;
     }
     last_avail_out = strm.avail_out;
     if (strm.next_out) {
-      if (strm.avail_out === 0 || status === Z_STREAM_END$1) {
+      if (strm.avail_out === 0 || status === Z_STREAM_END) {
         if (this.options.to === 'string') {
           let next_out_utf8 = strings.utf8border(strm.output, strm.next_out);
           let tail = strm.next_out - next_out_utf8;
@@ -2040,9 +2040,9 @@ Inflate.prototype.push = function (data, flush_mode) {
         }
       }
     }
-    if (status === Z_OK$1 && last_avail_out === 0) continue;
-    if (status === Z_STREAM_END$1) {
-      status = inflate_1.inflateEnd(this.strm);
+    if (status === Z_OK && last_avail_out === 0) continue;
+    if (status === Z_STREAM_END) {
+      status = inflate_1$1.inflateEnd(this.strm);
       this.onEnd(status);
       this.ended = true;
       return true;
@@ -2055,7 +2055,7 @@ Inflate.prototype.onData = function (chunk) {
   this.chunks.push(chunk);
 };
 Inflate.prototype.onEnd = function (status) {
-  if (status === Z_OK$1) {
+  if (status === Z_OK) {
     if (this.options.to === 'string') {
       this.result = this.chunks.join('');
     } else {
@@ -2066,7 +2066,7 @@ Inflate.prototype.onEnd = function (status) {
   this.err = status;
   this.msg = this.strm.msg;
 };
-function inflate$1(input, options) {
+function inflate(input, options) {
   const inflator = new Inflate(options);
   inflator.push(input);
   if (inflator.err) throw inflator.msg || messages[inflator.err];
@@ -2075,19 +2075,19 @@ function inflate$1(input, options) {
 function inflateRaw(input, options) {
   options = options || {};
   options.raw = true;
-  return inflate$1(input, options);
+  return inflate(input, options);
 }
 var Inflate_1 = Inflate;
-var inflate_2$1 = inflate$1;
+var inflate_2 = inflate;
 var inflateRaw_1 = inflateRaw;
-var ungzip = inflate$1;
-var constants$1 = constants;
-var inflate_1$1 = {
+var ungzip = inflate;
+var constants = constants$1;
+var inflate_1 = {
   Inflate: Inflate_1,
-  inflate: inflate_2$1,
+  inflate: inflate_2,
   inflateRaw: inflateRaw_1,
   ungzip: ungzip,
-  constants: constants$1
+  constants: constants
 };
 
 class DataBuffer {
@@ -2152,7 +2152,7 @@ class DataBuffer {
 }
 var dataBuffer = DataBuffer;
 
-let debug = () => {};
+let debug$2 = () => {};
 class DataBufferList {
   constructor() {
     this.first = null;
@@ -2182,7 +2182,7 @@ class DataBufferList {
     this.availableBytes += buffer.length;
     this.availableBuffers++;
     this.totalBuffers++;
-    debug('append:', this.totalBuffers);
+    debug$2('append:', this.totalBuffers);
     return this.totalBuffers;
   }
   moreAvailable() {
@@ -2714,7 +2714,7 @@ class DataStream {
 }
 var dataStream = DataStream;
 
-let debug$2 = () => {};
+let debug = () => {};
 class AudioWAV extends dataStream {
   constructor(list, overrides, opts) {
     const options = {
@@ -2730,7 +2730,7 @@ class AudioWAV extends dataStream {
     this.parse();
   }
   static fromFile(data, options) {
-    debug$2('fromFile:', data.length, data.byteLength);
+    debug('fromFile:', data.length, data.byteLength);
     const buffer = new dataBuffer(data);
     const list = new dataBufferList();
     list.append(buffer);
@@ -2739,7 +2739,7 @@ class AudioWAV extends dataStream {
     }, options);
   }
   static fromBuffer(buffer, options) {
-    debug$2('fromBuffer:', buffer.length);
+    debug('fromBuffer:', buffer.length);
     const list = new dataBufferList();
     list.append(buffer);
     return new AudioWAV(list, {
@@ -2791,8 +2791,8 @@ class AudioWAV extends dataStream {
     return header;
   }
   decodeChunk() {
-    debug$2('decodeChunk at offset', this.offset, 'with', this.remainingBytes());
-    const type = this.readString(4);
+    debug('decodeChunk at offset', this.offset, 'with', this.remainingBytes());
+    let type = this.readString(4);
     let size = this.readUInt32(true);
     if (size < 0) {
       throw new Error(`Invalid SubChunk Size: ${0xFFFFFFFF & size}`);
@@ -2801,7 +2801,11 @@ class AudioWAV extends dataStream {
       size += 1;
     }
     if (size > this.remainingBytes()) {
-      debug$2('decodeChunk size', size, 'too large, using remaining bytes', this.remainingBytes());
+      debug('decodeChunk size', size, 'too large, using remaining bytes', this.remainingBytes());
+      size = this.remainingBytes();
+    }
+    if (!type || size === 0) {
+      type = '(broken)';
       size = this.remainingBytes();
     }
     switch (type) {
@@ -2928,6 +2932,29 @@ class AudioWAV extends dataStream {
           });
           break;
         }
+      case 'PAD ':
+        {
+          this.rewind(8);
+          const chunk = this.read(8 + size, true);
+          AudioWAV.decodePAD(chunk, this.options);
+          this.chunks.push({
+            type: 'padding',
+            chunk
+          });
+          break;
+        }
+      case 'PEAK':
+        {
+          this.rewind(8);
+          const chunk = this.read(8 + size, true);
+          const value = AudioWAV.decodePEAK(chunk, this.options);
+          this.chunks.push({
+            type: 'peak',
+            value,
+            chunk
+          });
+          break;
+        }
       case 'acid':
         {
           this.rewind(8);
@@ -2935,6 +2962,18 @@ class AudioWAV extends dataStream {
           const value = AudioWAV.decodeACID(chunk);
           this.chunks.push({
             type: 'acid',
+            value,
+            chunk
+          });
+          break;
+        }
+      case 'strc':
+        {
+          this.rewind(8);
+          const chunk = this.read(8 + size, true);
+          const value = AudioWAV.decodeSTRC(chunk);
+          this.chunks.push({
+            type: 'strc',
             value,
             chunk
           });
@@ -2996,6 +3035,33 @@ class AudioWAV extends dataStream {
             type: 'cart',
             chunk,
             unknown: true
+          });
+          break;
+        }
+      case 'AFAn':
+      case 'AFmd':
+        {
+          this.rewind(8);
+          const chunk = this.read(8 + size, true);
+          this.chunks.push({
+            type,
+            chunk,
+            description: 'macOS Special Binary Chunk'
+          });
+          break;
+        }
+      case 'minf':
+      case 'elm1':
+      case 'regn':
+      case 'ovwf':
+      case 'umid':
+        {
+          this.rewind(8);
+          const chunk = this.read(8 + size, true);
+          this.chunks.push({
+            type,
+            chunk,
+            description: 'ProTools Special Chunk'
           });
           break;
         }
@@ -3881,7 +3947,7 @@ class AudioWAV extends dataStream {
         value.extraParams = format.read(value.extraParamSize, true);
       }
     }
-    debug$2('decodeFMT =', JSON.stringify(value, null, 2));
+    debug('decodeFMT =', JSON.stringify(value, null, 2));
     return value;
   }
   static encodeFMT(data = {}) {
@@ -3909,7 +3975,7 @@ class AudioWAV extends dataStream {
       buffer.fill(0, 26, 26 + extraParamSize);
       buffer.write(extraParams, 26);
     }
-    debug$2('Buffer:', buffer.toString('hex'));
+    debug('Buffer:', buffer.toString('hex'));
     return buffer;
   }
   static decodeLIST(chunk) {
@@ -3934,7 +4000,7 @@ class AudioWAV extends dataStream {
           break;
         }
     }
-    debug$2('decodeLIST =', JSON.stringify(value, null, 2));
+    debug('decodeLIST =', JSON.stringify(value, null, 2));
     return value;
   }
   static decodeLISTINFO(list) {
@@ -3978,12 +4044,12 @@ class AudioWAV extends dataStream {
     return value;
   }
   static decodeDATA(chunk) {
-    debug$2(`decodeDATA: ${chunk.length} data bytes`);
+    debug(`decodeDATA: ${chunk.length} data bytes`);
   }
   static decodeTLST(chunk) {
     const tlst = dataStream.fromData(chunk);
-    const _chunkID = tlst.readString(4);
-    const size = tlst.readUInt32(true);
+    tlst.readString(4);
+    tlst.readUInt32(true);
     const list = tlst.readUInt32(true);
     const name = tlst.readString(4);
     const type = tlst.readUInt32(true);
@@ -4006,37 +4072,54 @@ class AudioWAV extends dataStream {
       extraData,
       function: func
     };
-    debug$2('decodeTLST =', JSON.stringify(value, null, 2));
+    debug('decodeTLST =', JSON.stringify(value, null, 2));
     return value;
   }
   static decodeFACT(chunk) {
     const fact = dataStream.fromData(chunk);
-    const _chunkID = fact.readString(4);
-    const size = fact.readUInt32(true);
-    const data = fact.readUInt8();
+    fact.readString(4);
+    fact.readUInt32(true);
+    const numberOfSamples = fact.readUInt32(true);
     const value = {
-      data
+      numberOfSamples
     };
-    debug$2('decodeFACT =', JSON.stringify(value, null, 2));
+    debug('decodeFACT =', JSON.stringify(value, null, 2));
+    return value;
+  }
+  static decodePEAK(chunk) {
+    const peak = dataStream.fromData(chunk);
+    peak.readString(4);
+    peak.readUInt32(true);
+    const version = peak.readUInt32(true);
+    const timestamp = peak.readUInt32(true);
+    const ppeakPointer = peak.readUInt32(true);
+    const bitAlign = peak.readUInt32(true);
+    const value = {
+      version,
+      timestamp,
+      ppeakPointer,
+      bitAlign
+    };
+    debug('decodePEAK =', JSON.stringify(value, null, 2));
     return value;
   }
   static decodeDISP(chunk) {
     const disp = dataStream.fromData(chunk);
-    const _chunkID = disp.readString(4);
-    const size = disp.readUInt32(true);
+    disp.readString(4);
+    disp.readUInt32(true);
     const type = disp.readUInt32(true);
     const data = disp.readUInt16(true);
     const value = {
       type,
       data
     };
-    debug$2('decodeDISP =', JSON.stringify(value, null, 2));
+    debug('decodeDISP =', JSON.stringify(value, null, 2));
     return value;
   }
   static decodeACID(chunk) {
     const acid = dataStream.fromData(chunk);
-    const _chunkID = acid.readString(4);
-    const size = acid.readUInt32(true);
+    acid.readString(4);
+    acid.readUInt32(true);
     const type = acid.readUInt32(true);
     const rootNote = acid.readUInt16(true);
     const unknown1 = acid.readUInt16(true);
@@ -4055,13 +4138,13 @@ class AudioWAV extends dataStream {
       meterNumerator,
       tempo
     };
-    debug$2('decodeACID =', JSON.stringify(value, null, 2));
+    debug('decodeACID =', JSON.stringify(value, null, 2));
     return value;
   }
   static decodeINST(chunk) {
     const inst = dataStream.fromData(chunk);
-    const _chunkID = inst.readString(4);
-    const size = inst.readUInt32(true);
+    inst.readString(4);
+    inst.readUInt32(true);
     const unshiftedNote = inst.readUInt8();
     const fineTuning = inst.readUInt8();
     const gain = inst.readUInt8();
@@ -4078,13 +4161,13 @@ class AudioWAV extends dataStream {
       lowVelocity,
       highVelocity
     };
-    debug$2('decodeINST =', JSON.stringify(value, null, 2));
+    debug('decodeINST =', JSON.stringify(value, null, 2));
     return value;
   }
   static decodeSMPL(chunk) {
     const smpl = dataStream.fromData(chunk);
-    const _chunkID = smpl.readString(4);
-    const size = smpl.readUInt32(true);
+    smpl.readString(4);
+    smpl.readUInt32(true);
     const manufacturer1 = smpl.readUInt8();
     const manufacturer2 = smpl.readUInt8();
     const manufacturer3 = smpl.readUInt8();
@@ -4102,12 +4185,12 @@ class AudioWAV extends dataStream {
     const sampleDataSize = smpl.readUInt8();
     if (sampleLoopsCount > 0) {
       for (let i = 0; i < sampleLoopsCount; i++) {
-        const ID = smpl.readUInt8();
-        const type = smpl.readUInt8();
-        const start = smpl.readUInt8();
-        const end = smpl.readUInt8();
-        const fraction = smpl.readUInt8();
-        const count = smpl.readUInt8();
+        smpl.readUInt8();
+        smpl.readUInt8();
+        smpl.readUInt8();
+        smpl.readUInt8();
+        smpl.readUInt8();
+        smpl.readUInt8();
       }
     }
     let sampleData;
@@ -4132,7 +4215,7 @@ class AudioWAV extends dataStream {
       sampleDataSize,
       sampleData
     };
-    debug$2('decodeSMPL =', JSON.stringify(value, null, 2));
+    debug('decodeSMPL =', JSON.stringify(value, null, 2));
     return value;
   }
   static decodeRLND(chunk) {
@@ -4521,7 +4604,7 @@ class AudioWAV extends dataStream {
       sampleIndex,
       sampleLabel
     };
-    debug$2('decodeRLND =', JSON.stringify(value, null, 2));
+    debug('decodeRLND =', JSON.stringify(value, null, 2));
     return value;
   }
   static encodeRLND(data) {
@@ -4912,7 +4995,7 @@ class AudioWAV extends dataStream {
       }
     }
     buffer.writeUInt8(sampleIndex, 20);
-    debug$2('Buffer:', buffer.toString('hex'));
+    debug('Buffer:', buffer.toString('hex'));
     return buffer;
   }
   static decodeJUNK(chunk, options) {
@@ -4922,7 +5005,13 @@ class AudioWAV extends dataStream {
     if (options.roundOddChunks && size % 2 !== 0) {
       size += 1;
     }
-    debug$2(`decodeJUNK: ${chunk.length} bytes, chunkID: ${chunkID}, junk size: ${size}`);
+    debug(`decodeJUNK: ${chunk.length} bytes, chunkID: ${chunkID}, junk size: ${size}`);
+  }
+  static decodePAD(chunk) {
+    const pad = dataStream.fromData(chunk);
+    const chunkID = pad.readString(4);
+    const size = pad.readUInt32(true);
+    debug(`decodePAD: ${chunk.length} bytes, chunkID: ${chunkID}, pad size: ${size}`);
   }
   static decodeBEXT(chunk, options) {
     const bext = dataStream.fromData(chunk);
@@ -4951,7 +5040,7 @@ class AudioWAV extends dataStream {
     value.maxShortTermLoudness = bext.readUInt16(true);
     value.reserved = bext.read(180, true);
     value.codingHistory = bext.read(bext.remainingBytes(), true);
-    debug$2('decodeBEXT =', JSON.stringify(value, null, 2));
+    debug('decodeBEXT =', JSON.stringify(value, null, 2));
     return value;
   }
   static decodeCue(chunk) {
@@ -4976,9 +5065,9 @@ class AudioWAV extends dataStream {
       value.data.push(point);
     }
     if (cue.remainingBytes() > 0) {
-      debug$2(`Unexpected ${cue.remainingBytes()} bytes remaining`);
+      debug(`Unexpected ${cue.remainingBytes()} bytes remaining`);
     }
-    debug$2('decodeCue =', JSON.stringify(value, null, 2));
+    debug('decodeCue =', JSON.stringify(value, null, 2));
     return value;
   }
   static decodeResU(chunk) {
@@ -4988,8 +5077,8 @@ class AudioWAV extends dataStream {
     const data = resu.read(size, true);
     let decompressed;
     try {
-      decompressed = inflate_1$1.inflate(data);
-      debug$2('Inflated Size:', decompressed.length);
+      decompressed = inflate_1.inflate(data);
+      debug('Inflated Size:', decompressed.length);
     } catch (error) {
     }
     const value = {
@@ -5000,7 +5089,7 @@ class AudioWAV extends dataStream {
       value.data = JSON.parse(decompressed);
     } catch (error) {
     }
-    debug$2('decodeResU =', JSON.stringify(value, null, 2));
+    debug('decodeResU =', JSON.stringify(value, null, 2));
     return value;
   }
   static decodeDS64(chunk) {
@@ -5036,7 +5125,55 @@ class AudioWAV extends dataStream {
       tableLength,
       table
     };
-    debug$2('decodeDS64 =', JSON.stringify(value, null, 2));
+    debug('decodeDS64 =', JSON.stringify(value, null, 2));
+    return value;
+  }
+  static decodeSTRC(chunk) {
+    const strc = dataStream.fromData(chunk);
+    strc.readString(4);
+    strc.readUInt32(true);
+    const unknown1 = strc.readUInt32(true);
+    const numberOfSlices = strc.readUInt32(true);
+    const unknown2 = strc.readUInt32(true);
+    const unknown3 = strc.readUInt32(true);
+    const unknown4 = strc.readUInt32(true);
+    const unknown5 = strc.readUInt32(true);
+    const unknown6 = strc.readUInt32(true);
+    const slices = [];
+    for (let i = 0; i < numberOfSlices - 1; i++) {
+      const header = strc.readUInt32(true);
+      const ID1 = strc.readUInt32(true);
+      const samplePositionUpper = strc.readUInt32(true);
+      const samplePositionLower = strc.readUInt32(true);
+      const samplePosition2Upper = strc.readUInt32(true);
+      const samplePosition2Lower = strc.readUInt32(true);
+      const data3 = strc.readUInt32(true);
+      const ID2 = strc.readUInt32(true);
+      const slice = {
+        header,
+        ID1,
+        samplePositionUpper,
+        samplePositionLower,
+        samplePosition2Upper,
+        samplePosition2Lower,
+        data3,
+        ID2
+      };
+      debug('remaining', strc.remainingBytes());
+      slices.push(slice);
+    }
+    debug('decodeSTRC remaining', strc.remainingBytes());
+    const value = {
+      unknown1,
+      numberOfSlices,
+      unknown2,
+      unknown3,
+      unknown4,
+      unknown5,
+      unknown6,
+      slices
+    };
+    debug('decodeSTRC =', JSON.stringify(value, null, 2));
     return value;
   }
 }
@@ -5055,7 +5192,7 @@ const makeDetail = (key, value, keyClass = '', valueClass = '') => {
   detail.append(valueNode);
   return detail;
 };
-const known = ['header', 'format', 'list', 'data', 'roland', 'display', 'broadcast_extension', 'logic_resu', 'cue_points', 'sample', 'instrument', 'trigger_list', 'data_size_64', 'acid'];
+const known = ['header', 'format', 'list', 'data', 'roland', 'display', 'broadcast_extension', 'logic_resu', 'cue_points', 'sample', 'instrument', 'trigger_list', 'data_size_64', 'acid', 'padding'];
 const labelType = 'Chunk Type:';
 const renderChunk = chunk => {
   const chunkNode = document.createElement('div');

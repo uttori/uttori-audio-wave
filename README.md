@@ -122,6 +122,7 @@ The WAVE file format is a subset of Microsoft's RIFF specification for the stora
         * [.decodeDATA(chunk)](#AudioWAV.decodeDATA)
         * [.decodeTLST(chunk)](#AudioWAV.decodeTLST) ⇒ <code>object</code>
         * [.decodeFACT(chunk)](#AudioWAV.decodeFACT) ⇒ <code>object</code>
+        * [.decodePEAK(chunk)](#AudioWAV.decodePEAK) ⇒ <code>object</code>
         * [.decodeDISP(chunk)](#AudioWAV.decodeDISP) ⇒ <code>object</code>
         * [.decodeACID(chunk)](#AudioWAV.decodeACID) ⇒ <code>object</code>
         * [.decodeINST(chunk)](#AudioWAV.decodeINST) ⇒ <code>object</code>
@@ -129,10 +130,12 @@ The WAVE file format is a subset of Microsoft's RIFF specification for the stora
         * [.decodeRLND(chunk)](#AudioWAV.decodeRLND) ⇒ <code>object</code>
         * [.encodeRLND(data)](#AudioWAV.encodeRLND) ⇒ <code>Buffer</code>
         * [.decodeJUNK(chunk, options)](#AudioWAV.decodeJUNK)
+        * [.decodePAD(chunk)](#AudioWAV.decodePAD)
         * [.decodeBEXT(chunk, options)](#AudioWAV.decodeBEXT) ⇒ <code>object</code>
         * [.decodeCue(chunk)](#AudioWAV.decodeCue) ⇒ <code>object</code>
         * [.decodeResU(chunk)](#AudioWAV.decodeResU) ⇒ <code>object</code>
         * [.decodeDS64(chunk)](#AudioWAV.decodeDS64) ⇒ <code>object</code>
+        * [.decodeSTRC(chunk)](#AudioWAV.decodeSTRC) ⇒ <code>object</code>
 
 <a name="new_AudioWAV_new"></a>
 
@@ -360,16 +363,29 @@ Decode the fact chunk.
 Fact chunks exist in all wave files that are compressed or that have a wave list chunk.
 A fact chunk is not required in an uncompressed PCM file that does not have a wave list chunk.
 
-According to the fact chunk's initial specification,
-the data portion of the fact chunk will contain only
-one 4-byte number that specifies the number of samples
-in the data chunk of the Wave file. This number,
-when combined with the samples per second value in
-the format chunk of the Wave file, can be used to
-compute the length of the audio data in seconds.
+According to the fact chunk's initial specification, the data portion of the fact chunk will contain only one 4-byte number that specifies the number of samples in the data chunk of the Wave file.
+This number, when combined with the samples per second value in the format chunk of the Wave file, can be used to compute the length of the audio data in seconds.
 
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
 **Returns**: <code>object</code> - The decoded values.  
+**See**
+
+- [Fact chunk (of a Wave file)](https://www.recordingblogs.com/wiki/fact-chunk-of-a-wave-file)
+- [Audio File Format Specifications](http://www-mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html)
+
+
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+
+<a name="AudioWAV.decodePEAK"></a>
+
+### AudioWAV.decodePEAK(chunk) ⇒ <code>object</code>
+Decode the PEAK chunk.
+
+**Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+**Returns**: <code>object</code> - The decoded values.  
+**See**: [awesome-wav - WAVFormat.wiki](https://code.google.com/archive/p/awesome-wav/wikis/WAVFormat.wiki)  
 
 | Param | Type | Description |
 | --- | --- | --- |
@@ -507,6 +523,17 @@ When writing RIFFs, JUNK chunks should not have an odd Size.
 | options | <code>object</code> | Decoding options. |
 | options.roundOddChunks | <code>boolean</code> | When true we will round odd chunk sizes up to keep in spec. |
 
+<a name="AudioWAV.decodePAD"></a>
+
+### AudioWAV.decodePAD(chunk)
+Decode the `PAD ` (Padding) chunk.
+
+**Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+
 <a name="AudioWAV.decodeBEXT"></a>
 
 ### AudioWAV.decodeBEXT(chunk, options) ⇒ <code>object</code>
@@ -564,6 +591,21 @@ DataSize 64 Parsing
 **Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
 **Returns**: <code>object</code> - The decoded values.  
 **See**: [RF64: An extended File Format for Audio](https://tech.ebu.ch/docs/tech/tech3306v1_0.pdf)  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| chunk | <code>string</code> \| <code>Buffer</code> | Data Blob |
+
+<a name="AudioWAV.decodeSTRC"></a>
+
+### AudioWAV.decodeSTRC(chunk) ⇒ <code>object</code>
+Decode the STRC (ACID Related) chunk.
+
+When a wave file is used as wave samples in a MIDI synthesizer,
+the instrument chunk helps the MIDI synthesizer define the sample pitch & relative volume of the samples.
+
+**Kind**: static method of [<code>AudioWAV</code>](#AudioWAV)  
+**Returns**: <code>object</code> - The decoded values.  
 
 | Param | Type | Description |
 | --- | --- | --- |
