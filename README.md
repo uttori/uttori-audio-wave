@@ -30,6 +30,20 @@ AudioWAV supports parsing the following WAVE chunks:
 - `smpl` - Sample Chunk
 - `tlst` - Trigger List Chunk
 
+Known but currently unimplemented deep parsing chunks (Protools, Logic X, ):
+
+- `id3 ` - ID3 Tags
+- `ID3 ` - ID3 Tags
+- `LGWV` - Logic Pro
+- `minf` - Pro Tools
+- `elm1` - Pro Tools
+- `regn` - Pro Tools
+- `umid` - Pro Tools
+- `DGDA` - Pro Tools
+- `MXrt` - Sequoia Pro
+- `muma` - Sequoia Pro
+- `chrp` - Sequoia Pro
+
 ## Install
 
 ```bash
