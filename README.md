@@ -8,6 +8,10 @@
 [![Minified + GZip](https://badgen.net/bundlephobia/minzip/@uttori/audio-wave)](https://bundlephobia.com/result?p=@uttori/audio-wave)
 [![Minified](https://badgen.net/bundlephobia/min/@uttori/audio-wave)](https://bundlephobia.com/result?p=@uttori/audio-wave)
 
+# Package Moved
+
+No longer supported, project has been integrated into https://github.com/uttori/uttori-data-tools directly.
+
 # Uttori AudioWAV
 
 Utility for reading, parsing and basic encoding for Waveform Audio File Format (WAVE / WAV) files. Check out [the demo](https://uttori.github.io/uttori-audio-wave/) to explore the chunks for a given WAV file in the browser.
